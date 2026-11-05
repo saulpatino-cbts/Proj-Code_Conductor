@@ -85,6 +85,7 @@ async function setup(withStart: boolean) {
   return { runPath, run, state };
 }
 function rows() { return host.trees.get('codeConductor.runs').getChildren().map((item: any) => item.node); }
+function watcherPath(path: string): string { return path.replace(/\\/g, '/'); }
 describe('extension task, evidence and knowledge events', () => {
   it('explains why orchestrator setup cannot start without a selected trusted repository', async () => {
     await setup(false);
@@ -122,7 +123,7 @@ describe('extension task, evidence and knowledge events', () => {
     await host.commands.get('codeConductor.openEvidence')!(run.runId, evidenceId);
     expect(document.getText()).toContain('cannot be verified');
     store.saveToolOutput(run.runId, { evidenceId, source, stdout, stderr: '', status: 1, timedOut: false, truncated: false, sha256, digestMethod: 'streams' });
-    host.listeners.get('fileChange')!({ path: join(temp, 'home/runs', run.runId, 'tool-output', `${evidenceId}.stdout`) });
+    host.listeners.get('fileChange')!({ path: watcherPath(join(temp, 'home/runs', run.runId, 'tool-output', `${evidenceId}.stdout`)) });
     await vi.advanceTimersByTimeAsync(151); expect(document.getText()).toContain(stdout);
     const opened = host.opened.length;
     await host.commands.get('codeConductor.openEvidence')!(run.runId, '../manifest'); expect(host.opened).toHaveLength(opened);
@@ -199,6 +200,35 @@ describe('extension task, evidence and knowledge events', () => {
     await host.commands.get('codeConductor.doctor')!();
     expect(rows().find((row: any) => row.label === 'Last task: succeeded')).toBeDefined();
   });
+  it('opens packaged effective configuration and keeps multi-root runs repository-scoped', async () => {
+    const { run, runPath } = await setup(false);
+    await host.commands.get('codeConductor.openFile')!(undefined, 'config/capabilities.yaml');
+    const configuration = [...host.documents.values()].find((document: any) => document.uri.scheme === 'code-conductor-config');
+    expect(configuration?.getText()).toContain('# Effective configuration (read-only)');
+    expect(configuration?.getText()).toContain('headless_execution_enabled: false');
+
+    const foreignRepository = join(temp, 'foreign-repository');
+    mkdirSync(foreignRepository);
+    const foreignRunId = 'CC-foreign';
+    const foreignRunPath = join(runPath, '..', foreignRunId);
+    mkdirSync(foreignRunPath, { recursive: true });
+    writeFileSync(join(foreignRunPath, 'manifest.json'), JSON.stringify({
+      ...run,
+      runId: foreignRunId,
+      task: { ...run.task, repository: foreignRepository, objective: 'Foreign repository run' },
+    }));
+    host.folders = [
+      { uri: { fsPath: run.task.repository }, name: 'repository' },
+      { uri: { fsPath: foreignRepository }, name: 'foreign-repository' },
+    ];
+    host.picks = [(items: any[]) => items.find((item) => item.description === foreignRepository)];
+    await host.commands.get('codeConductor.selectWorkspace')!();
+
+    expect(rows().filter((node: any) => node.contextValue === 'run').map((node: any) => node.label)).toEqual(['Foreign repository run']);
+    const openedBefore = host.opened.length;
+    await host.commands.get('codeConductor.openRun')!(run.runId);
+    expect(host.opened).toHaveLength(openedBefore);
+  });
   it('expires an observed start without polling or subsequent filesystem events', async () => {
     await setup(true);
     expect(rows().find((row: any) => row.contextValue === 'run').children.find((row: any) => row.label.startsWith('builder ·')).description).toBe('running');
@@ -217,7 +247,7 @@ describe('extension task, evidence and knowledge events', () => {
   it('coalesces file changes and refreshes from stored evidence', async () => {
     const { runPath, run } = await setup(false);
     run.task.objective = 'Updated objective'; writeFileSync(join(runPath, 'manifest.json'), JSON.stringify(run));
-    for (let n = 0; n < 3; n++) host.listeners.get('fileChange')!({ path: join(runPath, 'manifest.json') });
+    for (let n = 0; n < 3; n++) host.listeners.get('fileChange')!({ path: watcherPath(join(runPath, 'manifest.json')) });
     expect(rows().find((row: any) => row.contextValue === 'run').label).toBe('Test execution overview');
     await vi.advanceTimersByTimeAsync(151);
     expect(rows().find((row: any) => row.contextValue === 'run').label).toBe('Updated objective');

@@ -135,6 +135,11 @@
         "command": "codeConductor.setupOrchestrator",
         "title": "Code Conductor: Orchestrator Interview / Redo",
         "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "codeConductor.inspectOrchestrator",
+        "title": "Code Conductor: Inspect Orchestrator Status",
+        "icon": "$(list-tree)"
       }
     ],
     "viewsContainers": {

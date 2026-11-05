@@ -1,11 +1,13 @@
 # ADR 0019 — Pack controls, short interview and a live orchestrator blueprint
 
-- **Status:** Proposed
-- **Date:** 2026-10-28
+- **Status:** Accepted
+- **Date:** 2026-11-05
 - **Scope:** owner-clarified #140/#142 UX and orchestrator context/handoff files
 - **Related:** ADR 0013, ADR 0015, ADR 0016, ADR 0018; D-059, D-060, D-076, D-078
 
 ## Context
+
+The owner accepted this design baseline on 2026-11-05. Acceptance authorizes local implementation within this ADR's scope; it does not authorize external provider invocation, customer-repository artifact application, cloud changes, publication, or other consequential actions without their separate approval gates.
 
 The owner clarified the intended interaction: **+** downloads available pack
 names/versions, **−** permits pending **×** removals, and **Save** commits that
