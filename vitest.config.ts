@@ -8,6 +8,9 @@ export default defineConfig({
     environment: 'node',
     globalSetup: ['tests/global-setup.ts'],
     setupFiles: ['tests/setup-git-env.ts'],
+    // Mitigation only: a fresh full-suite run passed with two workers after historical Git-init fixture failures;
+    // the native Git-init root cause remains unverified.
+    maxWorkers: process.platform === 'win32' ? 2 : undefined,
     // Git-heavy tests take several times longer on Windows (process start, NTFS, Defender):
     // on the owner's workstation 44 of them passed only once given more than 5 s (2026-10-19).
     // Linux keeps the default, so CI still catches a test that hangs.

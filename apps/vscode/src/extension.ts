@@ -1,5 +1,6 @@
 import { evidenceText, isCaptureId } from './evidence.js';
-import { runInterview } from './interview.js';
+import { interviewStorageKey, runInterview } from './interview.js';
+import { orchestratorStatusText } from './orchestrator-status.js';
 import { assignmentProgress, displayedDecision, nextProgressExpiry, progressEvents, type ProgressEvent } from './run-monitor.js';
 import { KnowledgeIndexCache, indexVault, obsidianOpenUri, resolveKnowledgeNote, validateConnection, type VaultConnection } from './knowledge.js';
 import { relative } from 'node:path';
@@ -306,7 +307,8 @@ function gateNodes(root: string): Node[] {
 function packNodes(root: string): Node[] {
   const inventory = packInventory(root);
   const inspect: vscode.Command = { command: 'codeConductor.inspectPacks', title: 'Inspect pack provenance' };
-  if (!inventory.manifestSha256 && !inventory.lockSha256 && !inventory.diagnostics.length) return [{ label: 'No APM packaging', description: 'optional', tooltip: 'Basic handoffs work without APM. Click for packaging requirements.', icon: 'package', command: inspect }];
+  const orchestrator: Node = { label: 'Orchestrator status', description: 'read-only · proposal/review pending', tooltip: 'Inspect local pack evidence and interview proposal hashes. Review, accepted baseline, artifact application and runtime use remain separately gated or unknown.', icon: 'checklist', command: { command: 'codeConductor.inspectOrchestrator', title: 'Inspect orchestrator status' } };
+  if (!inventory.manifestSha256 && !inventory.lockSha256 && !inventory.diagnostics.length) return [{ label: 'No APM packaging', description: 'optional', tooltip: 'Basic handoffs work without APM. Click for packaging requirements.', icon: 'package', command: inspect }, orchestrator];
   let ownSkills: number | undefined;
   try {
     const parent = lstatSync(join(root, '.apm'), { throwIfNoEntry: false });
@@ -318,6 +320,7 @@ function packNodes(root: string): Node[] {
     }
   } catch { /* unavailable is distinct from zero */ }
   return [
+    orchestrator,
     { label: 'Own skills', description: ownSkills === undefined ? 'unavailable' : String(ownSkills), tooltip: 'Repository-authored skill directories; not an audit or trust claim.', icon: 'extensions', command: inspect },
     ...inventory.packs.map((pack): Node => ({ label: printable(pack.name, 80, false), description: `${pack.state} · ${pack.commit?.slice(0, 12) ?? 'no locked commit'}`, tooltip: `Declared: ${printable(pack.reference, 300, false)}. Lock association only; audit unknown.`, icon: pack.state === 'mismatch' || pack.state === 'unsupported' ? 'warning' : 'package', command: inspect })),
     { label: 'Targets', description: inventory.targets.map((target) => printable(target, 40)).join(', ') || 'none', icon: 'symbol-array', command: openFile(root, 'apm.yml', 'Open apm.yml') },
@@ -755,6 +758,24 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     packs.refresh();
     // Regenerate a new snapshot on each request; never claim an old audit or live state.
     await vscode.window.showTextDocument(document, { preview: true });
+  }));
+  context.subscriptions.push(vscode.commands.registerCommand('codeConductor.inspectOrchestrator', async () => {
+    const r = root(); if (!r) return;
+    try {
+      const stored = await context.secrets.get(interviewStorageKey(r));
+      if (root() !== r) return;
+      let interview: unknown;
+      if (stored !== undefined) {
+        try { interview = JSON.parse(stored) as unknown; }
+        catch { interview = null; }
+      }
+      const content = orchestratorStatusText(r, packInventory(r), interview);
+      const document = await vscode.workspace.openTextDocument({ content, language: 'plaintext' });
+      if (root() !== r) return;
+      await vscode.window.showTextDocument(document, { preview: true });
+    } catch {
+      await vscode.window.showWarningMessage('Orchestrator status is unavailable for the current repository. No project files were changed.');
+    }
   }));
   let interviewOpen = false;
   context.subscriptions.push(vscode.commands.registerCommand('codeConductor.setupOrchestrator', async () => {

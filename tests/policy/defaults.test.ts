@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -7,6 +7,7 @@ import { loadConfiguration } from '../../packages/policy/src/defaults.js';
 import { createTask, planTask } from '../../packages/runtime/src/index.js';
 import { detectGateProfiles, runGates } from '../../packages/gates/src/index.js';
 import { loadMcpCatalog } from '../../packages/mcp/src/index.js';
+import { createTestSymlink } from '../helpers/symlinks.js';
 
 const folders: string[] = [];
 function fixture(): string { const path = mkdtempSync(join(tmpdir(), 'cc-defaults-')); folders.push(path); return path; }
@@ -93,12 +94,15 @@ describe('packaged zero-scaffolding defaults', () => {
     preferences(workspace, { version: 1, rolePreferences: { builder: ['claude'] } });
     expect(() => loadConfiguration(workspace, 'roles', { userRoot: user })).toThrow(/no eligible harness/);
   });
-  it('rejects oversized and symlink overrides', () => {
+  it('rejects oversized overrides', () => {
     const root = fixture(); preferences(root, { version: 1 });
     writeFileSync(join(root, '.code-conductor', 'config.json'), ' '.repeat(65537));
     expect(() => loadConfiguration(root, 'roles', { userRoot: null })).toThrow(/bounded/);
+  });
+  it('rejects symlink overrides', (context) => {
+    const root = fixture(); preferences(root, { version: 1 });
     rmSync(join(root, '.code-conductor', 'config.json'));
-    symlinkSync(join(resolve('.'), 'package.json'), join(root, '.code-conductor', 'config.json'));
+    if (!createTestSymlink(join(resolve('.'), 'package.json'), join(root, '.code-conductor', 'config.json'), 'file')) context.skip('This Windows environment does not permit creating symbolic links.');
     expect(() => loadConfiguration(root, 'roles', { userRoot: null })).toThrow(/Symlink/);
   });
   it('build outputs exactly match canonical config and their manifest hashes', () => {
@@ -122,17 +126,26 @@ describe('independent review regressions', () => {
     writeFileSync(join(root, 'package.json'), '{"name":"@code-conductor/root"}');
     expect(detectGateProfiles(root)).toEqual(['code-conductor']);
   });
-  it.each(['user', 'workspace'])('rejects dangling %s configuration symlinks', (source) => {
+  it('rejects dangling user configuration symlinks', (context) => {
     const user = fixture(), workspace = fixture();
-    const target = source === 'user' ? user : workspace;
-    mkdirSync(join(target, '.code-conductor'));
-    symlinkSync(join(target, 'nonexistent-config'), join(target, '.code-conductor', 'config.json'));
+    mkdirSync(join(user, '.code-conductor'));
+    if (!createTestSymlink(join(user, 'nonexistent-config'), join(user, '.code-conductor', 'config.json'), 'file')) context.skip('This Windows environment does not permit creating symbolic links.');
     expect(() => loadConfiguration(workspace, 'roles', { userRoot: user })).toThrow(/Symlink/);
   });
-  it.each(['user', 'workspace'])('rejects dangling %s configuration directory links', (source) => {
+  it('rejects dangling workspace configuration symlinks', (context) => {
     const user = fixture(), workspace = fixture();
-    const target = source === 'user' ? user : workspace;
-    symlinkSync(join(target, 'nonexistent-directory'), join(target, '.code-conductor'), 'dir');
+    mkdirSync(join(workspace, '.code-conductor'));
+    if (!createTestSymlink(join(workspace, 'nonexistent-config'), join(workspace, '.code-conductor', 'config.json'), 'file')) context.skip('This Windows environment does not permit creating symbolic links.');
+    expect(() => loadConfiguration(workspace, 'roles', { userRoot: user })).toThrow(/Symlink/);
+  });
+  it('rejects dangling user configuration directory links', (context) => {
+    const user = fixture(), workspace = fixture();
+    if (!createTestSymlink(join(user, 'nonexistent-directory'), join(user, '.code-conductor'), 'dir')) context.skip('This Windows environment does not permit creating symbolic links.');
+    expect(() => loadConfiguration(workspace, 'roles', { userRoot: user })).toThrow(/Symlink/);
+  });
+  it('rejects dangling workspace configuration directory links', (context) => {
+    const user = fixture(), workspace = fixture();
+    if (!createTestSymlink(join(workspace, 'nonexistent-directory'), join(workspace, '.code-conductor'), 'dir')) context.skip('This Windows environment does not permit creating symbolic links.');
     expect(() => loadConfiguration(workspace, 'roles', { userRoot: user })).toThrow(/Symlink/);
   });
 });

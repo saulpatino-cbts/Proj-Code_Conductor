@@ -1,8 +1,9 @@
-import { readFileSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { readFileSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { packInventory, packInventoryText } from '../../apps/vscode/src/pack-inventory.js';
+import { createTestSymlink } from '../helpers/symlinks.js';
 const roots: string[] = [];
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 const pin = 'a'.repeat(40);
@@ -24,13 +25,14 @@ describe('optional pack inventory', () => {
     expect(packInventoryText(directory)).toContain('Audit state: unknown');
     lock(directory, 'b'.repeat(40)); expect(packInventory(directory).packs[0]?.state).toBe('mismatch');
   });
-  it('refuses malformed/oversized/symlinked metadata and does not echo parser secrets', () => {
+  it('refuses malformed/oversized/symlinked metadata and does not echo parser secrets', (context) => {
     const directory = root(); const path = join(directory, 'apm.yml');
     for (const input of ['targets: [secret-private-token', 'x'.repeat(1048577)]) {
       writeFileSync(path, input); const inventory = packInventory(directory);
       expect(inventory.diagnostics).toHaveLength(1); expect(packInventoryText(directory)).not.toContain('secret-private-token');
     }
-    rmSync(path); const target = join(directory, 'target'); writeFileSync(target, 'targets: []'); symlinkSync(target, path);
+    rmSync(path); const target = join(directory, 'target'); writeFileSync(target, 'targets: []');
+    if (!createTestSymlink(target, path, 'file')) context.skip('This Windows environment does not permit creating symbolic links.');
     expect(packInventory(directory).diagnostics).toHaveLength(1);
   });
   it('diagnoses malformed fields and refuses a foreign lock host', () => {

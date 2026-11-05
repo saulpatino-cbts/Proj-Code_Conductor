@@ -2,9 +2,13 @@ import * as vscode from 'vscode';
 import { createHash } from 'node:crypto';
 import { confirmInterview, interviewDraft, previewInterview, INTERVIEW_FIELDS, type InterviewState, type InterviewOrigins } from '@code-conductor/runtime/interview';
 
+export function interviewStorageKey(root: string): string {
+  return `codeConductor.interview.${createHash('sha256').update(root).digest('hex')}`;
+}
+
 /** Explicit setup only. Saved answers are private; generated project files stay proposals. */
 export async function runInterview(context: vscode.ExtensionContext, root: string, stillSelected: () => boolean): Promise<void> {
-  const key = `codeConductor.interview.${createHash('sha256').update(root).digest('hex')}`;
+  const key = interviewStorageKey(root);
   const stored = await context.secrets.get(key);
   let previous: InterviewState | undefined;
   try {

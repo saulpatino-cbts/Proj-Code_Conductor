@@ -57,6 +57,19 @@ These functions prepare proposals only. They do not record acceptance, write
 project files, run an AI review, or activate a blueprint in the task runtime.
 Their before/after bytes still require the reviewed artifact application path.
 
+The VS Code **Orchestrator status** cockpit entry is a local read-only inspection.
+It shows bounded APM inventory evidence and, when available, hashes of the existing
+interview-only draft without displaying private answers. It labels catalog
+discovery, team metadata/review, accepted-baseline, application and runtime-use
+states as pending or unknown when evidence is absent. It does not read project
+`.agent/` files, invoke the catalog, validate a team graph, run the blueprint
+update planner, contact a provider or write project files. The displayed interview
+draft hashes describe an unreviewed and unapplied interview-only proposal; this
+inspection does not activate a runtime blueprint or complete #140/#142. Each
+untitled report is a timestamped static snapshot; it does not refresh when local
+inventory or interview data changes, so rerun **Code Conductor: Inspect
+Orchestrator Status** to obtain a new snapshot.
+
 ## Orchestrator interview preview
 
 The explicit **Orchestrator Interview / Redo** command offers defaults or three

@@ -1,8 +1,9 @@
-import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { inventoryNativeCustomizations } from '../../packages/apm-adapter/src/index.js';
+import { createTestSymlink } from '../helpers/symlinks.js';
 
 const created: string[] = [];
 function scratch(): string {
@@ -92,12 +93,12 @@ describe('provider-native inventory', () => {
     expect(names).toEqual(['Quoted Agent', 'comment', 'empty', 'spaces']);
   });
 
-  it('never follows symlinks out of the scanned directories', () => {
+  it('never follows symlinks out of the scanned directories', (context) => {
     const repo = scratch();
     const outside = scratch();
     write(join(outside, 'secret.md'), '---\nname: escaped\ndescription: d\n---\n');
     mkdirSync(join(repo, '.claude/agents'), { recursive: true });
-    symlinkSync(outside, join(repo, '.claude/agents/linked'), 'dir');
+    if (!createTestSymlink(outside, join(repo, '.claude/agents/linked'), 'dir')) context.skip('This Windows environment does not permit creating symbolic links.');
     const inventory = inventoryNativeCustomizations(repo, scratch());
     expect(inventory.entries.map((entry) => entry.name)).not.toContain('escaped');
   });
