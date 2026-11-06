@@ -9,6 +9,17 @@ import { detectGateProfiles, runGates } from '../../packages/gates/src/index.js'
 import { loadMcpCatalog } from '../../packages/mcp/src/index.js';
 
 const folders: string[] = [];
+const symlinkSupported = (() => {
+  try {
+    const root = fixture();
+    mkdirSync(join(root, '.code-conductor'), { recursive: true });
+    symlinkSync(join(resolve('.'), 'package.json'), join(root, '.code-conductor', 'config.json'));
+    rmSync(root, { recursive: true, force: true });
+    return true;
+  } catch {
+    return false;
+  }
+})();
 function fixture(): string { const path = mkdtempSync(join(tmpdir(), 'cc-defaults-')); folders.push(path); return path; }
 function preferences(root: string, value: unknown): void { mkdirSync(join(root, '.code-conductor'), { recursive: true }); writeFileSync(join(root, '.code-conductor', 'config.json'), JSON.stringify(value)); }
 afterEach(() => { for (const folder of folders.splice(0)) rmSync(folder, { recursive: true, force: true }); });
@@ -93,7 +104,7 @@ describe('packaged zero-scaffolding defaults', () => {
     preferences(workspace, { version: 1, rolePreferences: { builder: ['claude'] } });
     expect(() => loadConfiguration(workspace, 'roles', { userRoot: user })).toThrow(/no eligible harness/);
   });
-  it('rejects oversized and symlink overrides', () => {
+  it.skipIf(!symlinkSupported)('rejects oversized and symlink overrides', () => {
     const root = fixture(); preferences(root, { version: 1 });
     writeFileSync(join(root, '.code-conductor', 'config.json'), ' '.repeat(65537));
     expect(() => loadConfiguration(root, 'roles', { userRoot: null })).toThrow(/bounded/);
@@ -123,6 +134,7 @@ describe('independent review regressions', () => {
     expect(detectGateProfiles(root)).toEqual(['code-conductor']);
   });
   it.each(['user', 'workspace'])('rejects dangling %s configuration symlinks', (source) => {
+    if (!symlinkSupported) return;
     const user = fixture(), workspace = fixture();
     const target = source === 'user' ? user : workspace;
     mkdirSync(join(target, '.code-conductor'));
@@ -130,6 +142,7 @@ describe('independent review regressions', () => {
     expect(() => loadConfiguration(workspace, 'roles', { userRoot: user })).toThrow(/Symlink/);
   });
   it.each(['user', 'workspace'])('rejects dangling %s configuration directory links', (source) => {
+    if (!symlinkSupported) return;
     const user = fixture(), workspace = fixture();
     const target = source === 'user' ? user : workspace;
     symlinkSync(join(target, 'nonexistent-directory'), join(target, '.code-conductor'), 'dir');

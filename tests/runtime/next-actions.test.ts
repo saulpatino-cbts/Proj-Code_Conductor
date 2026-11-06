@@ -10,6 +10,14 @@ import { CLIENT_BILLS_SEPARATELY, CLIENT_NOT_SIGNED_IN, formatCommand, GIT_CONTR
 const BASE = realpathSync(mkdtempSync(join(tmpdir(), 'cc-next-actions-')));
 const ROOT = join(BASE, 'worktrees');
 mkdirSync(join(ROOT, 'abc', 'T-1', 'builder-codex'), { recursive: true });
+const symlinkSupported = (() => {
+  try {
+    symlinkSync(join(BASE, 'outside'), join(ROOT, 'abc', 'escape'));
+    return true;
+  } catch {
+    return false;
+  }
+})();
 afterAll(() => rmSync(BASE, { recursive: true, force: true }));
 const assignment = (id: string, role: string, harness: string, authority = ['observe', 'recommend']): AgentAssignment => ({
   id, taskId: 'T-1', agentId: `${role}-${harness}`, role, stance: role === 'builder' ? 'constructive' : 'critical', provider: harness === 'codex' ? 'openai' : 'anthropic', harness, surface: 'cli', billingChannel: 'subscription', authority, dependsOn: [],
@@ -116,7 +124,7 @@ describe('next actions', () => {
     expect(actions.map((action) => action.kind)).toEqual(['review_changes']);
   });
 
-  it('ignores worktree paths outside the root, relative, missing or reached through a symlink', () => {
+  it.skipIf(!symlinkSupported)('ignores worktree paths outside the root, relative, missing or reached through a symlink', () => {
     const outside = join(BASE, 'outside');
     mkdirSync(outside, { recursive: true });
     symlinkSync(outside, join(ROOT, 'abc', 'escape'));

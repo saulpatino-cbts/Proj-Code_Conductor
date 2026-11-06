@@ -9,11 +9,18 @@ const BASE = realpathSync(mkdtempSync(join(tmpdir(), 'cc-native-actions-')));
 const ROOT = join(BASE, 'worktrees');
 mkdirSync(join(ROOT, 'r', 'T', 'a'), { recursive: true });
 mkdirSync(join(BASE, 'outside'), { recursive: true });
-symlinkSync(join(BASE, 'outside'), join(ROOT, 'r', 'link'));
+const symlinkSupported = (() => {
+  try {
+    symlinkSync(join(BASE, 'outside'), join(ROOT, 'r', 'link'));
+    return true;
+  } catch {
+    return false;
+  }
+})();
 afterAll(() => rmSync(BASE, { recursive: true, force: true }));
 const action = (overrides: Partial<NextAction>): NextAction => ({ kind: 'retry_or_revise', title: 'Title', detail: 'Detail', surface: 'terminal', evidenceIds: [], ...overrides });
 
-describe('native operations for next actions', () => {
+describe.skipIf(!symlinkSupported)('native operations for next actions', () => {
   it('opens native Source Control only for worktrees under the Code Conductor root', () => {
     expect(nativeOperation(action({ kind: 'review_changes', path: `${ROOT}/r/T/a` }), ROOT)).toEqual({ type: 'open_source_control', path: `${ROOT}/r/T/a` });
     for (const path of ['/etc', `${ROOT}/../outside`, ROOT, 'relative/path', `${ROOT}/r/link`, `${ROOT}/r/missing`]) {

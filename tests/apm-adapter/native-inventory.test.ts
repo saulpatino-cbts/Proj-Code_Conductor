@@ -5,6 +5,19 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { inventoryNativeCustomizations } from '../../packages/apm-adapter/src/index.js';
 
 const created: string[] = [];
+const symlinkSupported = (() => {
+  try {
+    const repo = scratch();
+    const outside = scratch();
+    mkdirSync(join(repo, '.claude', 'agents'), { recursive: true });
+    symlinkSync(join(outside, 'secret.md'), join(repo, '.claude', 'agents', 'linked'), 'dir');
+    rmSync(repo, { recursive: true, force: true });
+    rmSync(outside, { recursive: true, force: true });
+    return true;
+  } catch {
+    return false;
+  }
+})();
 function scratch(): string {
   const dir = mkdtempSync(join(tmpdir(), 'cc-inventory-'));
   created.push(dir);
@@ -92,7 +105,7 @@ describe('provider-native inventory', () => {
     expect(names).toEqual(['Quoted Agent', 'comment', 'empty', 'spaces']);
   });
 
-  it('never follows symlinks out of the scanned directories', () => {
+  it.skipIf(!symlinkSupported)('never follows symlinks out of the scanned directories', () => {
     const repo = scratch();
     const outside = scratch();
     write(join(outside, 'secret.md'), '---\nname: escaped\ndescription: d\n---\n');

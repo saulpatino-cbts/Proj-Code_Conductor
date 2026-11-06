@@ -4,6 +4,19 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { packInventory, packInventoryText } from '../../apps/vscode/src/pack-inventory.js';
 const roots: string[] = [];
+const symlinkSupported = (() => {
+  try {
+    const directory = root();
+    const path = join(directory, 'apm.yml');
+    const target = join(directory, 'target');
+    writeFileSync(target, 'targets: []');
+    symlinkSync(target, path);
+    rmSync(directory, { recursive: true, force: true });
+    return true;
+  } catch {
+    return false;
+  }
+})();
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 const pin = 'a'.repeat(40);
 function root() { const value = mkdtempSync(join(tmpdir(), 'cc-packs-')); roots.push(value); return value; }
@@ -24,7 +37,7 @@ describe('optional pack inventory', () => {
     expect(packInventoryText(directory)).toContain('Audit state: unknown');
     lock(directory, 'b'.repeat(40)); expect(packInventory(directory).packs[0]?.state).toBe('mismatch');
   });
-  it('refuses malformed/oversized/symlinked metadata and does not echo parser secrets', () => {
+  it.skipIf(!symlinkSupported)('refuses malformed/oversized/symlinked metadata and does not echo parser secrets', () => {
     const directory = root(); const path = join(directory, 'apm.yml');
     for (const input of ['targets: [secret-private-token', 'x'.repeat(1048577)]) {
       writeFileSync(path, input); const inventory = packInventory(directory);
