@@ -11,11 +11,15 @@ const BASE = realpathSync(mkdtempSync(join(tmpdir(), 'cc-next-actions-')));
 const ROOT = join(BASE, 'worktrees');
 mkdirSync(join(ROOT, 'abc', 'T-1', 'builder-codex'), { recursive: true });
 const symlinkSupported = (() => {
+  // Probe at a path the tests do not create themselves, then remove it.
+  const probe = join(ROOT, 'abc', 'symlink-probe');
   try {
-    symlinkSync(join(BASE, 'outside'), join(ROOT, 'abc', 'escape'));
+    symlinkSync(join(BASE, 'outside'), probe);
     return true;
   } catch {
     return false;
+  } finally {
+    rmSync(probe, { force: true });
   }
 })();
 afterAll(() => rmSync(BASE, { recursive: true, force: true }));
