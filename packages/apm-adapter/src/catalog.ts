@@ -103,7 +103,7 @@ function publicTransport(): { request: CatalogRequest; close(): Promise<void> } 
       if (!/^\/(?:git\/ref\/heads\/main|tags\?per_page=100&page=[1-9][0-9]?|contents\/[a-zA-Z0-9_./-]+\?ref=[a-f0-9]{40})$/.test(path) || path.includes('..')) throw invalid();
       try {
         // request() has no redirect interceptor; any non-200 response is rejected below.
-        const response = await request(API + path, { dispatcher, signal, method: 'GET', headersTimeout: 15000, bodyTimeout: 15000, headers: { accept: 'application/vnd.github+json', 'user-agent': 'Code-Conductor/0.1.2', 'x-github-api-version': '2022-11-28' } });
+        const response = await request(API + path, { dispatcher, signal, method: 'GET', headersTimeout: 15000, bodyTimeout: 15000, headers: { accept: 'application/vnd.github+json', 'user-agent': 'Code-Conductor/0.1.3', 'x-github-api-version': '2022-11-28' } });
         if (response.statusCode !== 200) {
           response.body.destroy();
           if (response.statusCode === 403 || response.statusCode === 429) throw new CatalogError('Catalog access is limited or unavailable. Retry later; no package was installed.');
