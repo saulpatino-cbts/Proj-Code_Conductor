@@ -103,14 +103,22 @@ under #142. See [APM workflows](APM-WORKFLOWS.md).
 
 ## Active delivery work
 
-The owner's clarified APM target is **+** catalog/version discovery, **− / ×**
+The owner accepted ADR 0019 on 2026-11-05 as the design baseline for **+**
+catalog/version discovery, **− / ×**
 pending removals committed through **Save**, an illuminated **Orchestrator**
 refresh after additions, and Save-triggered reevaluation after removals. The
 chosen quality path is metadata validation plus approved AI review, with delta
 analysis and safe cache reuse. A short first-use/default/Redo interview produces
 the supplied blueprint's ten context files and live routing/handoff contracts.
-These controls/interview/files are **not implemented yet**. See [APM workflows](APM-WORKFLOWS.md)
-and proposed [ADR 0019](adr/0019-pack-controls-and-orchestrator-blueprint.md).
+These controls/interview/files are **not implemented yet**. Acceptance does not
+authorize provider calls, customer artifact application, cloud changes or
+publication. See [APM workflows](APM-WORKFLOWS.md) and accepted [ADR 0019](adr/0019-pack-controls-and-orchestrator-blueprint.md).
+
+A bounded VS Code **Orchestrator status** inspection now presents local pack
+inventory and interview-draft evidence while labeling team review, accepted
+baseline, application and runtime consumption as pending/unknown. It does not
+implement the accepted pack controls or activate the blueprint; #140/#142 remain
+open. See [APM workflows](APM-WORKFLOWS.md).
 
 - [#139](https://github.com/saulpatinojr/Proj-Code_Conductor/issues/139): remaining
   cockpit action/state coverage and real installed-VSIX interaction/host evidence.
@@ -141,6 +149,21 @@ and proposed [ADR 0019](adr/0019-pack-controls-and-orchestrator-blueprint.md).
 - PR creation and merge are owner-authorized after required checks; runtime
   provider/disclosure/commit/deployment approvals remain action-specific.
 
+## Incremental knowledge parsing follow-up
+
+The `feat/knowledge-incremental-index` branch adds a bounded metadata-only parsing
+cache for explicit knowledge browsing. Descriptor-bound note/source reads and
+click-time verification still run each time. Relationships are rebuilt, renamed
+notes use their new path/title, and deleted entries are pruned. The cache is
+owner-process memory only (200 entries / 2 MiB serialized metadata); connection,
+repository/folder changes and disposal clear it. This is incremental parsing,
+not a background watcher, persistent semantic index, remote verification or vault
+write workflow. Local validation passed: typecheck, **78 files / 703 passed /
+33 skipped**, repository validation and standalone bundle/default smoke.
+Independent read-only review found no blockers; installed Obsidian/desktop and
+whole-workstream acceptance remain separate. The associated PR records packaging
+and GitHub gate evidence.
+
 ## Prepared plan-review details
 
 Branch `feat/plan-review-details` adds a read-only plan-detail entry and summary
@@ -150,3 +173,13 @@ explains action-specific approval boundaries while labeling absent historical
 command/readiness snapshots unknown. This presentation does not grant authority
 or complete the full #140 acceptance; future snapshot capture and desktop
 walkthroughs remain separate.
+
+## Prepared future-plan snapshots
+
+Branch `feat/plan-provenance-snapshot` adds optional version-1 planning provenance
+for future CLI plans and persisted runtime runs: actual requested/inferred routing
+hints, provided-inventory membership (not sign-in/trust), and non-executing gate
+command/prerequisite previews. Older manifests remain readable and unknown. A
+preview is provisional original-repository evidence; execution still resolves its
+worktree command plan and obtains fresh approvals. This does not enable a client,
+a gate, a package installation or deployment, and does not close #140.

@@ -1,0 +1,24 @@
+{
+  "profiles": {
+    "node": {
+      "detect": {
+        "any_file": ["package.json"]
+      },
+      "gates": [
+        {
+          "id": "npm-typecheck",
+          "command": ["npm", "run", "typecheck"],
+          "requires_npm_script": "typecheck",
+          "blocking": true
+        },
+        {
+          "id": "npm-test",
+          "command": ["npm", "test"],
+          "requires_npm_script": "test",
+          "blocking": true,
+          "timeout_seconds": 1200
+        }
+      ]
+    }
+  }
+}

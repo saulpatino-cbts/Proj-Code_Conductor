@@ -1,7 +1,8 @@
 import { evidenceText, isCaptureId } from './evidence.js';
-import { runInterview } from './interview.js';
+import { interviewStorageKey, runInterview } from './interview.js';
+import { orchestratorStatusText } from './orchestrator-status.js';
 import { assignmentProgress, displayedDecision, nextProgressExpiry, progressEvents, type ProgressEvent } from './run-monitor.js';
-import { indexVault, obsidianOpenUri, resolveKnowledgeNote, validateConnection, type VaultConnection } from './knowledge.js';
+import { KnowledgeIndexCache, indexVault, obsidianOpenUri, resolveKnowledgeNote, validateConnection, type VaultConnection } from './knowledge.js';
 import { relative } from 'node:path';
 import { packInventory, packInventoryText } from './pack-inventory.js';
 import { sameRepository } from './run-scope.js';
@@ -306,7 +307,8 @@ function gateNodes(root: string): Node[] {
 function packNodes(root: string): Node[] {
   const inventory = packInventory(root);
   const inspect: vscode.Command = { command: 'codeConductor.inspectPacks', title: 'Inspect pack provenance' };
-  if (!inventory.manifestSha256 && !inventory.lockSha256 && !inventory.diagnostics.length) return [{ label: 'No APM packaging', description: 'optional', tooltip: 'Basic handoffs work without APM. Click for packaging requirements.', icon: 'package', command: inspect }];
+  const orchestrator: Node = { label: 'Orchestrator status', description: 'read-only · proposal/review pending', tooltip: 'Inspect local pack evidence and interview proposal hashes. Review, accepted baseline, artifact application and runtime use remain separately gated or unknown.', icon: 'checklist', command: { command: 'codeConductor.inspectOrchestrator', title: 'Inspect orchestrator status' } };
+  if (!inventory.manifestSha256 && !inventory.lockSha256 && !inventory.diagnostics.length) return [{ label: 'No APM packaging', description: 'optional', tooltip: 'Basic handoffs work without APM. Click for packaging requirements.', icon: 'package', command: inspect }, orchestrator];
   let ownSkills: number | undefined;
   try {
     const parent = lstatSync(join(root, '.apm'), { throwIfNoEntry: false });
@@ -318,6 +320,7 @@ function packNodes(root: string): Node[] {
     }
   } catch { /* unavailable is distinct from zero */ }
   return [
+    orchestrator,
     { label: 'Own skills', description: ownSkills === undefined ? 'unavailable' : String(ownSkills), tooltip: 'Repository-authored skill directories; not an audit or trust claim.', icon: 'extensions', command: inspect },
     ...inventory.packs.map((pack): Node => ({ label: printable(pack.name, 80, false), description: `${pack.state} · ${pack.commit?.slice(0, 12) ?? 'no locked commit'}`, tooltip: `Declared: ${printable(pack.reference, 300, false)}. Lock association only; audit unknown.`, icon: pack.state === 'mismatch' || pack.state === 'unsupported' ? 'warning' : 'package', command: inspect })),
     { label: 'Targets', description: inventory.targets.map((target) => printable(target, 40)).join(', ') || 'none', icon: 'symbol-array', command: openFile(root, 'apm.yml', 'Open apm.yml') },
@@ -605,6 +608,8 @@ class EvidenceProvider implements vscode.TextDocumentContentProvider {
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   const root = () => workspaceRoot();
+  const knowledgeCache = new KnowledgeIndexCache();
+  context.subscriptions.push({ dispose: () => knowledgeCache.clear() });
   const knowledgeKey = (r: string): string => `codeConductor.knowledge.${encodeURIComponent(r)}`;
   const connectionFor = (r: string | undefined): VaultConnection | undefined => r ? context.workspaceState.get<VaultConnection>(knowledgeKey(r)) : undefined;
   const knowledgeAvailable = (): boolean => vscode.workspace.isTrusted && !vscode.env.remoteName && process.platform === 'linux';
@@ -693,10 +698,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     const folders = vscode.workspace.workspaceFolders ?? [];
     const picked = await vscode.window.showQuickPick(folders.map((folder) => ({ label: folder.name, description: folder.uri.fsPath })), { placeHolder: 'Select the repository for Code Conductor' });
     if (!picked) return;
+    knowledgeCache.clear();
     selectedWorkspace = picked.description;
     await vscode.commands.executeCommand('codeConductor.refresh');
   }));
-  context.subscriptions.push(vscode.workspace.onDidChangeWorkspaceFolders(() => { void vscode.commands.executeCommand('codeConductor.refresh'); }));
+  context.subscriptions.push(vscode.workspace.onDidChangeWorkspaceFolders(() => { knowledgeCache.clear(); void vscode.commands.executeCommand('codeConductor.refresh'); }));
   context.subscriptions.push(vscode.commands.registerCommand('codeConductor.refreshRuns', refreshViews));
   context.subscriptions.push(vscode.workspace.onDidGrantWorkspaceTrust(() => { void vscode.commands.executeCommand('codeConductor.refresh'); }));
   context.subscriptions.push(vscode.commands.registerCommand('codeConductor.connectKnowledge', async () => {
@@ -708,6 +714,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     if (!folder?.[0] || folder[0].scheme !== 'file' || r !== root() || !knowledgeAvailable()) return;
     try {
       const connection = validateConnection({ vault: vault[0].fsPath, folder: relative(vault[0].fsPath, folder[0].fsPath).split('\\').join('/'), repository: r });
+      knowledgeCache.clear();
       await context.workspaceState.update(knowledgeKey(r), connection);
       await refreshViews();
       await vscode.window.showInformationMessage('Knowledge connected. Browse to index explicitly. No notes were created or uploaded.');
@@ -715,6 +722,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   }));
   context.subscriptions.push(vscode.commands.registerCommand('codeConductor.disconnectKnowledge', async () => {
     const r = root(); if (!r) return;
+    knowledgeCache.clear();
     await context.workspaceState.update(knowledgeKey(r), undefined);
     await refreshViews();
     await vscode.window.showInformationMessage('Knowledge disconnected. No notes were deleted.');
@@ -727,14 +735,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     if (!sameRepository(connection.repository, r)) return;
     if (runId !== undefined && (!validRunId(runId) || !sameRepository(storedManifest(runId)?.task.repository, r))) return;
     try {
-      const index = indexVault(connection);
+      const index = indexVault(connection, knowledgeCache);
       const notes = runId === undefined ? index.notes : index.notes.filter((note) => note.sources.some((source) => source.kind === 'run' && source.id === runId));
       if (!notes.length) { await vscode.window.showInformationMessage(`No matching knowledge notes. ${index.limited ? 'Scan limit reached; narrow the folder.' : 'Only valid metadata for the selected repository is indexed.'} ${index.diagnostics.length} excluded/unavailable items.`); return; }
       const selected = await vscode.window.showQuickPick(notes.map((note) => ({ label: printable(note.title, 100, false), description: `${note.kind} · ${note.sources.map((source) => source.state).join(', ') || 'no verified source'}`, detail: `${note.id}: ${note.edges.map((edge) => `${edge.kind} ${edge.target} (source ${edge.state})`).join('; ') || 'No declared edges'}`, note })), { placeHolder: `Local knowledge: ${notes.length} notes; ${index.diagnostics.length} excluded/unavailable items${index.limited ? ' · scan limited' : ''}`, matchOnDetail: true });
       if (!selected) return;
       const action = await vscode.window.showQuickPick(['Open in editor', 'Open in Obsidian'], { placeHolder: 'Knowledge is navigation; it grants no execution authority.' });
       if (!action || r !== root() || !knowledgeAvailable() || JSON.stringify(connectionFor(r)) !== JSON.stringify(connection)) return;
-      const path = resolveKnowledgeNote(connection, selected.note);
+      const path = resolveKnowledgeNote(connection, selected.note, knowledgeCache);
       if (action === 'Open in Obsidian') {
         try { if (await vscode.env.openExternal(vscode.Uri.parse(obsidianOpenUri(path)))) return; }
         catch { /* Unsupported URI characters or absent client fall back to the editor. */ }
@@ -750,6 +758,24 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     packs.refresh();
     // Regenerate a new snapshot on each request; never claim an old audit or live state.
     await vscode.window.showTextDocument(document, { preview: true });
+  }));
+  context.subscriptions.push(vscode.commands.registerCommand('codeConductor.inspectOrchestrator', async () => {
+    const r = root(); if (!r) return;
+    try {
+      const stored = await context.secrets.get(interviewStorageKey(r));
+      if (root() !== r) return;
+      let interview: unknown;
+      if (stored !== undefined) {
+        try { interview = JSON.parse(stored) as unknown; }
+        catch { interview = null; }
+      }
+      const content = orchestratorStatusText(r, packInventory(r), interview);
+      const document = await vscode.workspace.openTextDocument({ content, language: 'plaintext' });
+      if (root() !== r) return;
+      await vscode.window.showTextDocument(document, { preview: true });
+    } catch {
+      await vscode.window.showWarningMessage('Orchestrator status is unavailable for the current repository. No project files were changed.');
+    }
   }));
   let interviewOpen = false;
   context.subscriptions.push(vscode.commands.registerCommand('codeConductor.setupOrchestrator', async () => {

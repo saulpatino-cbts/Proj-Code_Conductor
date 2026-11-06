@@ -1,27 +1,21 @@
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, realpathSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { nativeOperation, signInHint } from '../../apps/vscode/src/native-actions.js';
 import { formatCommand, type NextAction } from '../../packages/runtime/src/next-actions.js';
+import { createTestSymlink } from '../helpers/symlinks.js';
 
 const BASE = realpathSync(mkdtempSync(join(tmpdir(), 'cc-native-actions-')));
 const ROOT = join(BASE, 'worktrees');
 mkdirSync(join(ROOT, 'r', 'T', 'a'), { recursive: true });
 mkdirSync(join(BASE, 'outside'), { recursive: true });
-const symlinkSupported = (() => {
-  try {
-    symlinkSync(join(BASE, 'outside'), join(ROOT, 'r', 'link'));
-    return true;
-  } catch {
-    return false;
-  }
-})();
 afterAll(() => rmSync(BASE, { recursive: true, force: true }));
 const action = (overrides: Partial<NextAction>): NextAction => ({ kind: 'retry_or_revise', title: 'Title', detail: 'Detail', surface: 'terminal', evidenceIds: [], ...overrides });
 
-describe.skipIf(!symlinkSupported)('native operations for next actions', () => {
-  it('opens native Source Control only for worktrees under the Code Conductor root', () => {
+describe('native operations for next actions', () => {
+  it('opens native Source Control only for worktrees under the Code Conductor root', (context) => {
+    if (!createTestSymlink(join(BASE, 'outside'), join(ROOT, 'r', 'link'), 'dir')) context.skip('This Windows environment does not permit creating symbolic links.');
     expect(nativeOperation(action({ kind: 'review_changes', path: `${ROOT}/r/T/a` }), ROOT)).toEqual({ type: 'open_source_control', path: `${ROOT}/r/T/a` });
     for (const path of ['/etc', `${ROOT}/../outside`, ROOT, 'relative/path', `${ROOT}/r/link`, `${ROOT}/r/missing`]) {
       expect(nativeOperation(action({ kind: 'review_changes', path, commands: [['git', '-C', path, 'status']] }), ROOT).type).toBe('copy_command');

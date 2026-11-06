@@ -1,27 +1,16 @@
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, realpathSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import type { AgentAssignment, AgentResult, ApprovalRecord, RunManifest } from '../../packages/schemas/src/index.js';
 import { CLIENT_BILLS_SEPARATELY, CLIENT_NOT_SIGNED_IN, formatCommand, GIT_CONTROL_CHANGED, nextActions, printable } from '../../packages/runtime/src/next-actions.js';
+import { createTestSymlink } from '../helpers/symlinks.js';
 
 // Worktree records are only offered when the path exists inside the root after
 // symlinks are resolved, so the fixture uses a real directory tree.
 const BASE = realpathSync(mkdtempSync(join(tmpdir(), 'cc-next-actions-')));
 const ROOT = join(BASE, 'worktrees');
 mkdirSync(join(ROOT, 'abc', 'T-1', 'builder-codex'), { recursive: true });
-const symlinkSupported = (() => {
-  // Probe at a path the tests do not create themselves, then remove it.
-  const probe = join(ROOT, 'abc', 'symlink-probe');
-  try {
-    symlinkSync(join(BASE, 'outside'), probe);
-    return true;
-  } catch {
-    return false;
-  } finally {
-    rmSync(probe, { force: true });
-  }
-})();
 afterAll(() => rmSync(BASE, { recursive: true, force: true }));
 const assignment = (id: string, role: string, harness: string, authority = ['observe', 'recommend']): AgentAssignment => ({
   id, taskId: 'T-1', agentId: `${role}-${harness}`, role, stance: role === 'builder' ? 'constructive' : 'critical', provider: harness === 'codex' ? 'openai' : 'anthropic', harness, surface: 'cli', billingChannel: 'subscription', authority, dependsOn: [],
@@ -128,10 +117,10 @@ describe('next actions', () => {
     expect(actions.map((action) => action.kind)).toEqual(['review_changes']);
   });
 
-  it.skipIf(!symlinkSupported)('ignores worktree paths outside the root, relative, missing or reached through a symlink', () => {
+  it('ignores worktree paths outside the root, relative, missing or reached through a symlink', (context) => {
     const outside = join(BASE, 'outside');
     mkdirSync(outside, { recursive: true });
-    symlinkSync(outside, join(ROOT, 'abc', 'escape'));
+    if (!createTestSymlink(outside, join(ROOT, 'abc', 'escape'), 'dir')) context.skip('This Windows environment does not permit creating symbolic links.');
     const paths = ['/etc', ROOT, 'abc/T-1/builder-codex', join(ROOT, 'abc', 'missing'), join(ROOT, 'abc', 'escape'), join(ROOT, '..', 'outside')];
     const actions = nextActions(manifest({ results: [result(builder)], worktrees: paths.map((path) => ({ ...worktree, path })) }), { worktreeRoot: ROOT });
     expect(actions.filter((action) => action.kind === 'review_changes')).toHaveLength(0);
