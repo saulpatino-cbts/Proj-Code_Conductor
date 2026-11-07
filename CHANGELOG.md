@@ -2,7 +2,9 @@
 
 All notable Code Conductor changes are recorded here. The project follows a pre-1.0 development model; entries remain under **Unreleased** until a release/tag is created.
 
-## Unreleased
+## 0.1.3 (2026-11-07)
+
+Prepared 2026-11-07 from `main`; the tag decides the release date (`docs/RELEASE.md`). An odd minor version marks a pre-release.
 
 - Reuse bounded in-memory knowledge frontmatter parsing by content and connection
   scope while rechecking current notes, sources and relationships on every scan.
