@@ -71,7 +71,7 @@ try {
   if (installed) {
     // The runtime reports the version the package declares, and read-only commands work without any run.
     assert.equal(ccon('version').trim(), JSON.parse(readFileSync(join(extension, 'package.json'), 'utf8')).version);
-    assert.match(ccon('worktrees'), /No Code Conductor agent worktrees recorded/);
+    assert.match(ccon('worktrees'), /No Architect Code Coductor agent worktrees recorded/);
   }
   assert.deepEqual(readdirSync(workspace), []);
   console.log(`${installed ? 'Installed VSIX' : 'Standalone bundled'} runtime/defaults: PASS (no source tree, node_modules, APM, or repository scaffolding).`);

@@ -68,6 +68,22 @@ describe('architect-first product positioning', () => {
     expect(cli).toContain('user.name=Code Conductor');
   });
 
+  it('keeps installed-bundle smoke output assertions aligned on every platform', () => {
+    // This contract runs even where Linux packaging integration tests are skipped.
+    const smoke = read('scripts/smoke-vscode-bundle.mjs');
+    const cli = read('packages/cli/src/index.ts');
+    const output = 'No Architect Code Coductor agent worktrees recorded in stored runs.';
+    expect(cli).toContain(output);
+    const assertion = smoke.match(/assert\.match\(ccon\('worktrees'\), \/(.*?)\/\);/);
+    expect(assertion, 'installed smoke must retain its worktrees output assertion').not.toBeNull();
+    if (!assertion?.[1]) throw new Error('Missing installed smoke worktrees pattern');
+    const pattern = new RegExp(assertion[1]);
+    expect(pattern.test(`${output}\n`)).toBe(true);
+    expect(pattern.test('No Code Conductor agent worktrees recorded in stored runs.\n')).toBe(false);
+    expect(pattern.test('')).toBe(false);
+    expect(pattern.test('Unexpected worktree command failure')).toBe(false);
+  });
+
   it('distinguishes the released Doctor title and preserves exact CI workflow identity', () => {
     const install = read('docs/INSTALL.md');
     const workstation = read('docs/WORKSTATION-VALIDATION.md');
