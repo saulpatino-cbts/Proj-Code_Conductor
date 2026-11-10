@@ -161,6 +161,9 @@ describe('extension task, evidence and knowledge events', () => {
     await host.commands.get('codeConductor.connectKnowledge')!();
     expect(scan).not.toHaveBeenCalled();
     expect([...state.keys()].some((key) => key.startsWith('codeConductor.knowledge.'))).toBe(true);
+    const knowledgeNode = host.trees.get('codeConductor.workstation').getChildren().map((item: any) => item.node).find((node: any) => node.label === 'Knowledge');
+    expect(knowledgeNode.children.map((node: any) => node.label)).toEqual(['Browse related knowledge', 'Disconnect knowledge vault']);
+    expect(knowledgeNode.children[1].command.command).toBe('codeConductor.disconnectKnowledge');
     host.picks = ['first', 'Open in Obsidian'];
     await host.commands.get('codeConductor.knowledge')!();
     expect(host.opened[0].fsPath).toBe(notePath);
@@ -174,7 +177,41 @@ describe('extension task, evidence and knowledge events', () => {
     await host.commands.get('codeConductor.disconnectKnowledge')!();
     expect(cache?.statistics).toEqual({ entries: 0, bytes: 0, parsed: 0, reused: 0 });
     expect([...state.keys()].some((key) => key.startsWith('codeConductor.knowledge.'))).toBe(false);
+    expect(host.trees.get('codeConductor.workstation').getChildren().map((item: any) => item.node).find((node: any) => node.label === 'Knowledge').children.map((node: any) => node.label)).toEqual(['Connect / browse knowledge']);
     expect(readFileSync(notePath, 'utf8')).toBe(text);
+  });
+  it('provides repository selection and honest optional APM status in the sidebar', async () => {
+    const { run } = await setup(false);
+    host.folders = [
+      { uri: { fsPath: run.task.repository }, name: 'repository' },
+      { uri: { fsPath: join(temp, 'other') }, name: 'other' },
+    ];
+    const workstation = host.trees.get('codeConductor.workstation').getChildren().map((item: any) => item.node);
+    const policy = host.trees.get('codeConductor.policy').getChildren().map((item: any) => item.node);
+    expect(workstation[0]).toMatchObject({ label: 'Select a repository', command: { command: 'codeConductor.selectWorkspace' } });
+    expect(policy[0]).toMatchObject({ label: 'Select a repository', command: { command: 'codeConductor.selectWorkspace' } });
+
+    host.folders = [{ uri: { fsPath: run.task.repository }, name: 'repository' }];
+    writeFileSync(join(run.task.repository, 'apm.yml'), `targets: [codex]\ndependencies:\n  apm: [hybridcloudworks/Proj-AgentPacks/example-pack#${'a'.repeat(40)}]\n`);
+    writeFileSync(join(run.task.repository, 'apm.lock.yaml'), `lockfile_version: '1'\napm_version: 0.33.0\ndependencies:\n- repo_url: hybridcloudworks/proj-agentpacks\n  host: github.com\n  materialization_repo_url: hybridcloudworks/Proj-AgentPacks\n  virtual_path: example-pack\n  resolved_commit: ${'a'.repeat(40)}\n  version: 1.0.0\n  deployed_files: [.codex/agents/example.md]\n`);
+    await host.commands.get('codeConductor.refreshRuns')!();
+    const groups = host.trees.get('codeConductor.workstation').getChildren().map((item: any) => item.node);
+    const packs = groups.find((node: any) => node.label === 'Packs').children;
+    const audit = packs.find((node: any) => node.label === 'Audit');
+    const preview = packs.find((node: any) => node.label === 'Pack projection preview unavailable');
+    expect(audit).toMatchObject({ description: 'unavailable · APM CLI not discovered' });
+    expect(audit.command).toBeUndefined();
+    expect(preview).toBeDefined();
+    expect(preview.command).toBeUndefined();
+  });
+  it('shows which failed prerequisite blocks a downstream assignment', async () => {
+    const { run, runPath } = await setup(false);
+    run.assignments.push({ ...run.assignments[0]!, id: 'review', agentId: 'reviewer', role: 'reviewer', stance: 'critical', dependsOn: ['A'] });
+    (run.results as any[]).push({ taskId: 'T', assignmentId: 'A', agentId: 'builder', role: 'builder', stance: 'constructive', provider: 'openai', harness: 'codex', billingChannel: 'subscription', status: 'failed', changes: [], tests: [], evidence: [], findings: [], risks: [], blockers: ['prerequisite failed'], recommendation: 'changes_required' });
+    writeFileSync(join(runPath, 'manifest.json'), JSON.stringify(run));
+    await host.commands.get('codeConductor.refreshRuns')!();
+    const review = rows().find((node: any) => node.contextValue === 'run').children.find((node: any) => node.label.startsWith('reviewer ·'));
+    expect(review.description).toBe('blocked · A (failed)');
   });
   it('does not scan knowledge in Restricted Mode or on remote hosts', async () => {
     const scan = vi.spyOn(knowledge, 'indexVault');

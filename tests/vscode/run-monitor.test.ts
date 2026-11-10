@@ -24,6 +24,16 @@ describe('stored execution overview', () => {
     expect(assignmentProgress(run, [start], now - 1).get('build')?.state).toBe('unknown');
     expect(assignmentProgress(run, [{ ...start, type: 'assignment.completed' }], now).get('build')?.state).toBe('unknown');
   });
+  it('distinguishes blocked dependencies from unfinished work and flags contradictory starts', () => {
+    const failed: RunManifest = { ...run, results: [{ ...run.assignments[0]!, assignmentId: 'build', status: 'failed', changes: [], tests: [], evidence: [], findings: [], risks: [], blockers: ['failed'], recommendation: 'changes_required' }] };
+    expect(assignmentProgress(failed, [], now).get('review')?.state).toBe('blocked');
+    for (const status of ['blocked', 'cancelled'] as const) {
+      const prerequisite = { ...failed.results[0]!, status };
+      expect(assignmentProgress({ ...run, results: [prerequisite] }, [], now).get('review')?.state).toBe('blocked');
+    }
+    expect(assignmentProgress(run, [], now).get('review')?.state).toBe('waiting');
+    expect(assignmentProgress(failed, [{ ...start, assignmentId: 'review' }], now).get('review')?.state).toBe('unknown');
+  });
   it('ignores foreign, malformed, hostile, unsupported and incomplete event lines', () => {
     const text = [null, { ...start, runId: 'foreign' }, { ...start, at: 'bad' }, { ...start, type: 'ready' }, start].map(JSON.stringify).join('\n') + '\n{';
     expect(progressEvents(text, run.runId)).toEqual([start]);

@@ -26,11 +26,16 @@ export function assignmentProgress(manifest: RunManifest, events: readonly Progr
     const result = manifest.results.find((item) => item.assignmentId === assignment.id);
     const last = [...events].reverse().find((event) => event.assignmentId === assignment.id);
     if (result) { states.set(assignment.id, { state: result.status, ...(last ? { observedAt: last.at } : {}) }); continue; }
+    const failedDependency = assignment.dependsOn.some((id) => manifest.results.some((item) =>
+      item.assignmentId === id && ['failed', 'blocked', 'cancelled'].includes(item.status)));
     if (last) {
       const age = now - Date.parse(last.at);
-      states.set(assignment.id, { state: last.type === 'assignment.started' && age >= 0 && age < 300000 && !manifest.mergeDecision ? 'running' : 'unknown', observedAt: last.at });
+      // A start observation conflicts with a terminally failed prerequisite;
+      // neither observation is safe to present as ordinary progress.
+      states.set(assignment.id, { state: !failedDependency && last.type === 'assignment.started' && age >= 0 && age < 300000 && !manifest.mergeDecision ? 'running' : 'unknown', observedAt: last.at });
       continue;
     }
+    if (failedDependency) { states.set(assignment.id, { state: 'blocked' }); continue; }
     const waiting = assignment.dependsOn.some((id) => !manifest.results.some((item) => item.assignmentId === id && item.status === 'completed'));
     states.set(assignment.id, { state: manifest.mergeDecision ? 'unknown' : waiting ? 'waiting' : 'planned' });
   }
