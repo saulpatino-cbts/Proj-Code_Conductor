@@ -252,6 +252,16 @@
         "when": "workbenchState == empty"
       },
       {
+        "view": "codeConductor.workstation",
+        "contents": "Open a repository folder to inspect workstation readiness and optional local knowledge.\n[Open Folder](command:vscode.openFolder)\n\nIn a multi-root workspace, select the repository from the Runs view first.",
+        "when": "workbenchState == empty"
+      },
+      {
+        "view": "codeConductor.policy",
+        "contents": "Open a repository folder to inspect its roles, risk classes and billing policy.\n[Open Folder](command:vscode.openFolder)",
+        "when": "workbenchState == empty"
+      },
+      {
         "view": "codeConductor.runs",
         "contents": "No runs yet. A run plans the roles a task needs, isolates the change in a worktree, has it reviewed, runs the deterministic gates and records the evidence.\n[Plan a Task](command:codeConductor.plan)\n\nExecuting a run happens in a terminal with `ccon run \u2026 --execute`, where each consequential step asks for your approval.",
         "when": "workbenchState != empty && !codeConductor.hasRuns"

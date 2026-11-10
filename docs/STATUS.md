@@ -1,18 +1,19 @@
 # Code Conductor working status
 
-Updated 2026-10-28 (UTC). This document distinguishes merged development work,
+Release status checked 2026-11-10 (UTC); earlier feature validation dates remain
+as recorded below. This document distinguishes merged development work,
 prepared changes and released/workstation evidence. GitHub and executable
 validation remain authoritative; issue scope alone is not completion.
 
 ## Current position
 
-**0.1.2 beta is published. Reliability, stored execution monitoring, optional
+**0.1.3 is published on GitHub. Reliability, stored execution monitoring, optional
 pack provenance/audit and read-only local knowledge navigation are merged on
 main. The full workstreams and release validation are not complete.**
 
 | Area | Evidence-backed status |
 |---|---|
-| Published release | [v0.1.2](https://github.com/saulpatinojr/Proj-Code_Conductor/releases/tag/v0.1.2), published October 22 from `130c155`, with VSIX, SBOM and checksums. New development changes are unreleased. |
+| Published release | [v0.1.3](https://github.com/saulpatinojr/Proj-Code_Conductor/releases/tag/v0.1.3), published November 7 from `7556349`, with VSIX, SBOM and checksums. Later development changes are unreleased. |
 | Dependency remediation | [#136](https://github.com/saulpatinojr/Proj-Code_Conductor/pull/136) merged at `f9130e8`: ACP 2.0.1 and dependency fixes. Local/CI validation is recorded in that PR. |
 | Initial cockpit reliability | [#143](https://github.com/saulpatinojr/Proj-Code_Conductor/pull/143) merged at `e3a145c`: task-end refresh, repository-scoped runs, multi-root selection and effective read-only configuration. |
 | Stored execution overview | [#144](https://github.com/saulpatinojr/Proj-Code_Conductor/pull/144) merged at `04ad126`: approved start observations, dependency/provider/authority details, evidence refresh, one-shot stale expiry and inert summary text. No new scheduler. |
@@ -21,7 +22,15 @@ main. The full workstreams and release validation are not complete.**
 | Native cockpit smoke | [#150](https://github.com/saulpatinojr/Proj-Code_Conductor/pull/150) merged at `25c3524`: repeatable installed-VSIX Linux command/document/task evidence and exact bundle hashes. |
 | Knowledge implementation | [#147](https://github.com/saulpatinojr/Proj-Code_Conductor/pull/147) merged at `599b03a`: bounded local knowledge navigation and source provenance, initially trusted local Linux only. |
 | Knowledge architecture | [#146](https://github.com/saulpatinojr/Proj-Code_Conductor/pull/146) merged at `5cf27ea`: accepted ADR 0016/D-078, optional bounded read-only navigation with no cloud activation. |
-| Workstation evidence | #4 is closed with recorded 0.1.1 Windows evidence: provider smoke tests, activation, R1/R2 and GitHub review. That is not clean-machine validation of 0.1.2 or current source. |
+| Workstation evidence | #4 is closed with recorded 0.1.1 Windows evidence: provider smoke tests, activation, R1/R2 and GitHub review. That is not clean-machine validation of 0.1.3 or current source. |
+
+The v0.1.3 [release workflow](https://github.com/saulpatinojr/Proj-Code_Conductor/actions/runs/42345472964)
+completed candidate, attestation and draft jobs, but its Marketplace publish job
+failed at **Publish the verified package**. GitHub release publication does not
+prove Marketplace availability. The publication failure cause, Marketplace
+listing and clean-machine installation remain unverified; no retry or release
+was initiated by this status check. Marketplace prerelease packaging remains
+separate work under #14.
 
 ## Merged evidence recovery
 

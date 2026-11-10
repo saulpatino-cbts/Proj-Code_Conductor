@@ -187,11 +187,15 @@ function runNode(runId: string): Node {
   for (const assignment of manifest.assignments) {
     const observation = progress.get(assignment.id)!;
     const result = manifest.results.find((item) => item.assignmentId === assignment.id);
+    const failedDependencies = assignment.dependsOn.flatMap((id) => {
+      const dependency = manifest.results.find((item) => item.assignmentId === id);
+      return dependency && ['failed', 'blocked', 'cancelled'].includes(dependency.status) ? [`${printable(id, 80)} (${dependency.status})`] : [];
+    });
     const blocking = result?.findings.filter((finding) => finding.blocking).length ?? 0;
     children.push({
       label: `${printable(assignment.role, 40)} · ${harnessLabel(assignment.harness)}`,
-      description: result ? `${printable(result.status, 40)} · ${printable(result.recommendation, 40)}${blocking ? ` · ${blocking} blocking` : ''}` : observation.state === 'unknown' ? 'unknown / stale' : observation.state,
-      tooltip: markdown([`**${printable(assignment.agentId, 80)}** (${printable(assignment.stance, 20)}, ${printable(assignment.surface ?? 'surface unknown', 20)})`, `Depends on: ${assignment.dependsOn.map((id) => printable(id, 80)).join(', ') || 'none'}. Provider: ${printable(assignment.provider, 60)}. Billing lane: ${printable(assignment.billingChannel, 30)} (planned, not authenticated). Current availability/trust: not recorded here. Authority: ${assignment.authority.map((item) => printable(item, 40)).join(', ')}.`, ...(observation.observedAt ? [`Last observation: ${observation.observedAt}. A start event is not a heartbeat.`] : []), ...(result ? [...result.blockers.map((b) => `- ⛔ ${printable(b, 400, false)}`), ...result.findings.map((f) => `- ${f.blocking ? '🛑' : '•'} ${printable(f.severity, 20)}: ${printable(f.summary, 400, false)}`), ...(result.notVerified ?? []).map((n) => `- not verified: ${printable(n, 300, false)}`)] : [])].join('\n')),
+      description: result ? `${printable(result.status, 40)} · ${printable(result.recommendation, 40)}${blocking ? ` · ${blocking} blocking` : ''}` : observation.state === 'unknown' ? 'unknown / stale' : observation.state === 'blocked' && failedDependencies.length ? `blocked · ${failedDependencies.join(', ')}` : observation.state,
+      tooltip: markdown([`**${printable(assignment.agentId, 80)}** (${printable(assignment.stance, 20)}, ${printable(assignment.surface ?? 'surface unknown', 20)})`, `Depends on: ${assignment.dependsOn.map((id) => printable(id, 80)).join(', ') || 'none'}. Provider: ${printable(assignment.provider, 60)}. Billing lane: ${printable(assignment.billingChannel, 30)} (planned, not authenticated). Current availability/trust: not recorded here. Authority: ${assignment.authority.map((item) => printable(item, 40)).join(', ')}.`, ...(failedDependencies.length ? [`Blocked by prerequisite result: ${failedDependencies.join(', ')}.`] : []), ...(observation.observedAt ? [`Last observation: ${observation.observedAt}. A start event is not a heartbeat.`] : []), ...(result ? [...result.blockers.map((b) => `- ⛔ ${printable(b, 400, false)}`), ...result.findings.map((f) => `- ${f.blocking ? '🛑' : '•'} ${printable(f.severity, 20)}: ${printable(f.summary, 400, false)}`), ...(result.notVerified ?? []).map((n) => `- not verified: ${printable(n, 300, false)}`)] : [])].join('\n')),
       ...statusLook(observation.state), command: open,
     });
   }
@@ -304,11 +308,21 @@ function gateNodes(root: string): Node[] {
   }));
 }
 
-function packNodes(root: string): Node[] {
+function packNodes(root: string, discovery?: LocalDiscovery): Node[] {
   const inventory = packInventory(root);
   const inspect: vscode.Command = { command: 'codeConductor.inspectPacks', title: 'Inspect pack provenance' };
   const orchestrator: Node = { label: 'Orchestrator status', description: 'read-only · proposal/review pending', tooltip: 'Inspect local pack evidence and interview proposal hashes. Review, accepted baseline, artifact application and runtime use remain separately gated or unknown.', icon: 'checklist', command: { command: 'codeConductor.inspectOrchestrator', title: 'Inspect orchestrator status' } };
   if (!inventory.manifestSha256 && !inventory.lockSha256 && !inventory.diagnostics.length) return [{ label: 'No APM packaging', description: 'optional', tooltip: 'Basic handoffs work without APM. Click for packaging requirements.', icon: 'package', command: inspect }, orchestrator];
+  const apmAvailability = discovery?.commands.apm === true
+    ? `APM CLI was found at ${discovery.capturedAt}; use Doctor/Refresh to verify current availability.`
+    : discovery?.commands.apm === false
+      ? `APM CLI was not found at ${discovery.capturedAt}; Refresh after installing it.`
+      : 'APM CLI availability is unknown; run Doctor or Refresh Local Discovery.';
+  const auditAvailable = discovery?.commands.apm === true;
+  const previewUnavailable = !vscode.workspace.isTrusted ? 'requires a trusted workspace'
+    : vscode.env.remoteName ? 'requires a local workspace'
+      : process.platform !== 'linux' ? 'requires local Linux'
+        : !auditAvailable ? 'APM CLI unavailable or not discovered' : undefined;
   let ownSkills: number | undefined;
   try {
     const parent = lstatSync(join(root, '.apm'), { throwIfNoEntry: false });
@@ -324,15 +338,17 @@ function packNodes(root: string): Node[] {
     { label: 'Own skills', description: ownSkills === undefined ? 'unavailable' : String(ownSkills), tooltip: 'Repository-authored skill directories; not an audit or trust claim.', icon: 'extensions', command: inspect },
     ...inventory.packs.map((pack): Node => ({ label: printable(pack.name, 80, false), description: `${pack.state} · ${pack.commit?.slice(0, 12) ?? 'no locked commit'}`, tooltip: `Declared: ${printable(pack.reference, 300, false)}. Lock association only; audit unknown.`, icon: pack.state === 'mismatch' || pack.state === 'unsupported' ? 'warning' : 'package', command: inspect })),
     { label: 'Targets', description: inventory.targets.map((target) => printable(target, 40)).join(', ') || 'none', icon: 'symbol-array', command: openFile(root, 'apm.yml', 'Open apm.yml') },
-    { label: 'Preview pack projections', description: 'optional · Codex · Linux', tooltip: 'Select reviewed public packs and compare their staged Codex projections. Downloads happen only on request. Repository files are unchanged; installation is separate.', icon: 'diff', command: { command: 'codeConductor.previewPacks', title: 'Preview pack projections' } },
-    { label: 'Audit', description: 'unknown · run explicitly', tooltip: 'Run the existing bounded APM audit in a terminal. Audit does not install packs or authorize providers.', icon: 'shield', command: { command: 'codeConductor.auditPacks', title: 'Audit packs' } },
+    { label: previewUnavailable ? 'Pack projection preview unavailable' : 'Preview pack projections', description: previewUnavailable ?? 'optional · Codex · local Linux', tooltip: previewUnavailable ? `${previewUnavailable}. No APM process was started.` : `Select reviewed public packs and compare their staged Codex projections. ${apmAvailability} Preview requires bubblewrap; downloads happen only on request. Repository files are unchanged; installation is separate.`, icon: previewUnavailable ? 'info' : 'diff', ...(previewUnavailable ? {} : { command: { command: 'codeConductor.previewPacks', title: 'Preview pack projections' } }) },
+    { label: 'Audit', description: auditAvailable ? 'unknown · run explicitly' : 'unavailable · APM CLI not discovered', tooltip: `${apmAvailability} ${auditAvailable ? 'Run the bounded APM audit explicitly in a terminal. Audit does not install packs or authorize providers.' : 'No audit action is offered until discovery finds the optional APM CLI.'}`, icon: auditAvailable ? 'shield' : 'info', ...(auditAvailable ? { command: { command: 'codeConductor.auditPacks', title: 'Audit packs' } } : {}) },
     ...inventory.diagnostics.map((message): Node => ({ label: 'APM metadata needs attention', tooltip: printable(message, 500, false), icon: 'warning', command: inspect })),
     { label: 'Pack provenance', description: 'read-only', icon: 'info', command: inspect },
   ];
 }
 
 function workstationNodes(root: string | undefined, discovery?: LocalDiscovery): Node[] {
-  if (!root) return [];
+  if (!root) return (vscode.workspace.workspaceFolders?.length ?? 0) > 1
+    ? [{ label: 'Select a repository', description: 'required for scoped workstation status', icon: 'folder', command: { command: 'codeConductor.selectWorkspace', title: 'Select repository' } }]
+    : [];
   if (!vscode.workspace.isTrusted) return [{ label: 'Restricted Mode', description: 'trust the workspace to discover clients', icon: 'lock', color: 'charts.yellow', command: { command: 'workbench.trust.manage', title: 'Manage Workspace Trust' } }];
   const clients = clientNodes(root, discovery);
   const tools = toolNodes(discovery);
@@ -341,14 +357,17 @@ function workstationNodes(root: string | undefined, discovery?: LocalDiscovery):
     { label: 'AI clients', description: `${clients.filter((c) => c.icon === 'pass').length} installed`, icon: 'hubot', expanded: true, children: clients, tooltip: 'Installed means found on this machine. Signed in and trusted are checked by Doctor and by the smoke tests.' },
     { label: 'Tools', description: missing ? `${missing} required missing` : `${tools.filter((t) => t.icon === 'pass').length} installed`, icon: 'tools', children: tools, color: missing ? 'testing.iconFailed' : undefined },
     { label: 'Gate profiles', description: `${gateNodes(root).length} profile(s)`, icon: 'shield', children: gateNodes(root), tooltip: 'Deterministic checks the validator runs, chosen by what the repository contains.' },
-    { label: 'Packs', description: existsSync(join(root, 'apm.lock.yaml')) ? 'APM' : 'none', icon: 'package', children: packNodes(root) },
+    { label: 'Packs', description: existsSync(join(root, 'apm.lock.yaml')) ? 'APM' : 'none', icon: 'package', children: packNodes(root, discovery) },
   ];
 }
 
 // ---------------------------------------------------------------- Policy
 
 function policyNodes(root: string | undefined): Node[] {
-  if (!root) return [];
+  if (!root) return (vscode.workspace.workspaceFolders?.length ?? 0) > 1
+    ? [{ label: 'Select a repository', description: 'required for repository policy', icon: 'folder', command: { command: 'codeConductor.selectWorkspace', title: 'Select repository' } }]
+    : [];
+  if (!vscode.workspace.isTrusted) return [{ label: 'Restricted Mode', description: 'trust the workspace to inspect repository policy', icon: 'lock', color: 'charts.yellow', command: { command: 'workbench.trust.manage', title: 'Manage Workspace Trust' } }];
   const roles = loadYaml<{ roles?: Record<string, { stance?: string; preferred_harnesses?: string[]; instructions?: string[] }> }>(root, 'config/roles.yaml');
   const risk = loadYaml<{ risk_classes?: Record<string, { description?: string; required_roles?: string[]; human_approval?: boolean }> }>(root, 'config/risk.yaml');
   const capabilities = loadYaml<CapabilityDocument>(root, 'config/capabilities.yaml');
@@ -625,7 +644,24 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const evidence = new EvidenceProvider();
   const providers = {
     runs: new ConductorProvider(() => runRows),
-    workstation: new ConductorProvider(() => [...workstationNodes(root(), context.workspaceState.get<LocalDiscovery>(STARTUP_DISCOVERY_KEY)), { label: 'Knowledge', description: connectionFor(root()) ? 'connected · on demand' : 'optional · not connected', icon: 'book', tooltip: 'Explicitly connect an existing local vault folder. No scan or note write at startup.', command: { command: 'codeConductor.knowledge', title: 'Browse related knowledge' } }]),
+    workstation: new ConductorProvider(() => {
+      const selectedRoot = root();
+      const connection = connectionFor(selectedRoot);
+      return [
+        ...workstationNodes(selectedRoot, context.workspaceState.get<LocalDiscovery>(STARTUP_DISCOVERY_KEY)),
+        ...(selectedRoot ? [{
+          label: 'Knowledge',
+          description: connection ? 'connected · explicit read-only index' : 'optional · not connected',
+          icon: 'book',
+          expanded: Boolean(connection),
+          tooltip: 'An optional local navigation layer. Connect or browse explicitly; no startup scan, note write, network request or provider process.',
+          children: [
+            { label: connection ? 'Browse related knowledge' : 'Connect / browse knowledge', description: connection ? 'on demand · repository scoped' : 'select an existing local vault folder', icon: 'book', command: { command: 'codeConductor.knowledge', title: 'Browse related knowledge' } },
+            ...(connection ? [{ label: 'Disconnect knowledge vault', description: 'forget connection only · keep notes', icon: 'debug-disconnect', command: { command: 'codeConductor.disconnectKnowledge', title: 'Disconnect Knowledge Vault' } }] : []),
+          ],
+        }] : []),
+      ];
+    }),
     policy: new ConductorProvider(() => policyNodes(root())),
   };
   context.subscriptions.push(
