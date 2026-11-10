@@ -1,6 +1,6 @@
 # The dogfood fixture repository
 
-Code Conductor's own quick test runs ("dogfood" runs) use a tiny separate repository, so a
+Architect Code Coductor's own quick test runs ("dogfood" runs) use a tiny separate repository, so a
 practice run never touches this one. This page says what it is, where it lives, how to use
 it, and how to rebuild it from scratch if it is ever deleted.
 
@@ -35,13 +35,13 @@ project.
 | `node_modules/.gitkeep` | An empty file, committed on purpose |
 
 The empty `node_modules/.gitkeep` is deliberate. The Node gate needs a `node_modules` folder
-to exist, and Code Conductor never installs dependencies into an agent worktree (D-061), so
+to exist, and Architect Code Coductor never installs dependencies into an agent worktree (D-061), so
 the folder is committed empty and the gate's prerequisite is met without installing anything.
 Do not remove it.
 
 ## How to use it
 
-You need Node.js 22 or newer, Git, and Code Conductor installed ([`INSTALL.md`](INSTALL.md)).
+You need Node.js 22 or newer, Git, and Architect Code Coductor installed ([`INSTALL.md`](INSTALL.md)).
 
 1. Clone it somewhere **outside** `~/.code-conductor`, for example next to your other
    repositories:
@@ -52,7 +52,7 @@ You need Node.js 22 or newer, Git, and Code Conductor installed ([`INSTALL.md`](
    npm test        # should pass in about a second
    ```
 
-2. Run Code Conductor against it. Without `--execute` it only plans and saves the run;
+2. Run Architect Code Coductor against it. Without `--execute` it only plans and saves the run;
    it does not start any paid client:
 
    ```bash
@@ -71,7 +71,7 @@ Suggested objectives, from the fixture's README:
 - "Add a test for multiply() in math.test.js; do not change math.js"
 - "Add a divide(a, b) function to math.js that throws on division by zero, with a test"
 
-Everything Code Conductor writes during a run stays under `~/.code-conductor`
+Everything Architect Code Coductor writes during a run stays under `~/.code-conductor`
 ([`INSTALL.md`](INSTALL.md)), apart from the `cc/...` branches and Git's own worktree
 bookkeeping inside the fixture's repository.
 

@@ -2,10 +2,10 @@
 
 Implements C03 from #32/#45. Decision: D-060.
 
-Code Conductor shows the next step, its scope and its evidence, then hands you to the
+Architect Code Coductor shows the next step, its scope and its evidence, then hands you to the
 native surface that owns that step. It does not rebuild those surfaces.
 
-| Concern | Native owner | What Code Conductor does |
+| Concern | Native owner | What Architect Code Coductor does |
 |---|---|---|
 | Diffs and commits | VS Code Source Control / Git | Records each agent worktree (`RunManifest.worktrees`); **Review in Source Control** opens it in the built-in Git view. If the Git extension is unavailable, it opens the folder in a new window. |
 | Sign-in | Each provider's official client | Shows the official sign-in command and documentation link from the packaged capabilities; never asks for, stores, copies or forwards credentials. |
@@ -21,7 +21,7 @@ lists what to do next. The same list appears in `ccon run` output and in the VS 
 **Runs** view. Each run shows its decision and first step; click a run to choose a step.
 
 - **Review changes**: the agent worktree, with `git status` and `git diff <base>`
-  commands. It is offered only for existing worktrees inside the Code Conductor worktree
+  commands. It is offered only for existing worktrees inside the Architect Code Coductor worktree
   root after symlinks are resolved, so a path outside that root is never opened, and
   `ccon import` rejects manifests that carry worktree records.
 - **Check Git configuration**: replaces the review step when the run stopped because Git
@@ -40,7 +40,7 @@ lists what to do next. The same list appears in `ccon run` output and in the VS 
   disclosure decision. On a terminal, control and format characters in the prompt are
   replaced; redirect stdout for the exact bytes. For an assignment that changes files, work
   in an isolated branch or worktree. The command is shown only for plain run and
-  assignment identifiers. To keep the outcome with Code Conductor's evidence, record it as
+  assignment identifiers. To keep the outcome with Architect Code Coductor's evidence, record it as
   a RunManifest file and bring it in with `ccon import`.
 - **Fix validation / Resolve findings**: links to the gate and finding evidence.
 - **Open a draft pull request**: shown only when the run is `ready` and the builder
@@ -49,7 +49,7 @@ lists what to do next. The same list appears in `ccon run` output and in the VS 
 Run records can be imported, so their text is untrusted. `ccon next`, `ccon handoff` and the
 VS Code views print each value on one line, with control, bidirectional and zero-width
 characters replaced. A record therefore cannot rewrite the terminal or add a step or a
-command line. Commands are built by Code Conductor from argument vectors and quoted for
+command line. Commands are built by Architect Code Coductor from argument vectors and quoted for
 the shell you paste into: POSIX shells, or PowerShell on Windows (shown as `PS>`).
 cmd.exe is not a supported paste target, because it does not treat single quotes as quoting.
 A command with a value that cannot be shown exactly is left out, and the step says so.
@@ -77,7 +77,7 @@ The links were verified against the vendors' official documentation on 2026-10-1
 
 Installed or detected never means signed in, healthy or trusted. Those states stay
 separate (#34), and execution additionally needs workstation trust and per-action approval.
-Code Conductor does not imply session portability between clients.
+Architect Code Coductor does not imply session portability between clients.
 
 ## Not covered here
 

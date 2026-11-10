@@ -1,8 +1,8 @@
-# Code Conductor Bootstrap Runbook
+# Architect Code Coductor Bootstrap Runbook
 
 ## Goal
 
-Bring a clean workstation and a target repository to a validated Code Conductor-ready state without relying on hidden chat context.
+Bring a clean workstation and a target repository to a validated Architect Code Coductor-ready state without relying on hidden chat context.
 
 ## 1. Workstation baseline
 
@@ -37,7 +37,7 @@ Recommended order:
 
 Do not copy consumer OAuth/session tokens into repository configuration.
 
-## 3. Clone Code Conductor
+## 3. Clone Architect Code Coductor
 
 ```bash
 git clone https://github.com/saulpatinojr/Proj-Code_Conductor.git
@@ -87,7 +87,7 @@ If the current APM release uses different exact target identifiers or manifest r
 
 Phase 1 will define the exact Node package manager/workspace tooling. Once committed, use the repository's pinned/package-manager declaration rather than a global assumption.
 
-## 7. Run Code Conductor diagnostics
+## 7. Run Architect Code Coductor diagnostics
 
 Once implemented:
 
@@ -108,7 +108,7 @@ ccon validate
 - sandbox capability
 - GitHub connectivity
 
-`ccon validate` should verify committed Code Conductor policy/configuration and reject invalid authority/risk combinations.
+`ccon validate` should verify committed Architect Code Coductor policy/configuration and reject invalid authority/risk combinations.
 
 ## 8. Target repository bootstrap
 
@@ -146,7 +146,7 @@ Only create files required by the selected profile/harness targets.
 
 ## 9. First dogfood run
 
-The first complete orchestration run should occur against Code Conductor itself:
+The first complete orchestration run should occur against Architect Code Coductor itself:
 
 1. create a task from Phase 1 acceptance criteria;
 2. classify R1/R2;

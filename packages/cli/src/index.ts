@@ -29,7 +29,7 @@ function listOption(args: string[], name: string): string[] { return getOption(a
 function printValidation(root: string): number {
   const report = validateRepositoryConfig(root);
   for (const issue of report.issues) console.log(`${issue.level === 'error' ? 'ERROR' : 'WARN'} ${issue.code}${issue.path ? ` [${issue.path}]` : ''}: ${issue.message}`);
-  console.log(report.ok ? 'Code Conductor repository validation: PASS' : 'Code Conductor repository validation: FAIL');
+  console.log(report.ok ? 'Architect Code Coductor repository validation: PASS' : 'Architect Code Coductor repository validation: FAIL');
   return report.ok ? 0 : 1;
 }
 
@@ -52,7 +52,7 @@ function isCodeConductorSource(root: string): boolean {
 
 // VS Code records the extensions it installed in extensions.json, in its extensions
 // folder. Reading that starts no process: on Windows `code` is a batch file, which needs
-// cmd.exe and which Code Conductor does not run. The folders are the ones VS Code and its
+// cmd.exe and which Architect Code Coductor does not run. The folders are the ones VS Code and its
 // remote server choose from (VSCODE_EXTENSIONS, VSCODE_PORTABLE, VSCODE_AGENT_FOLDER, then
 // the home folder). VS Code uses only the first that applies, but doctor's environment
 // need not be VS Code's, so it reads them all.
@@ -126,7 +126,7 @@ async function doctor(root: string): Promise<number> {
   const state = workstation.load();
   const adapters = createBuiltinAdapters();
   const extensions = vscodeExtensions();
-  console.log(`Code Conductor doctor ${VERSION}`);
+  console.log(`Architect Code Coductor doctor ${VERSION}`);
   let missingRequired = false;
 
   for (const [name, candidates] of requiredClients) {
@@ -161,7 +161,7 @@ async function doctor(root: string): Promise<number> {
       else console.log(`INFO trusted ${id} ${mode}: ${record?.clientVersion && record.clientVersion !== version && (record.readValidatedAt || record.modifyValidatedAt) ? `smoke test passed for ${printable(record.clientVersion)}, not the installed version; ` : ''}run \`ccon harness-smoke ${id} --mode ${mode}\``);
     }
   }
-  console.log('INFO authentication stays in each official client; Code Conductor runs only its documented status command and never reads or stores credentials.');
+  console.log('INFO authentication stays in each official client; Architect Code Coductor runs only its documented status command and never reads or stores credentials.');
 
   const knownExtensions = [
     ['claude', 'anthropic.claude-code'],
@@ -182,8 +182,8 @@ async function doctor(root: string): Promise<number> {
     console.log(`${found ? 'OK' : 'INFO'} tool ${name}: ${found ? candidates.find(hasCommand) : 'not found (optional unless repository profile requires it)'}`);
   }
 
-  for (const variable of BILLING_CREDENTIAL_VARIABLES) if (process.env[variable]) console.log(`WARN billing.api_credential_detected: ${variable} is set in this shell; Code Conductor removes it from provider processes (subscription-first), but other tools may still use it. Value is intentionally not displayed.`);
-  for (const variable of BILLING_ROUTING_VARIABLES) if (process.env[variable]) console.log(`WARN billing.provider_selection_detected: ${variable} is set in this shell and selects a separately billed provider, endpoint or credential; Code Conductor removes it from provider processes (subscription-first). Value is intentionally not displayed.`);
+  for (const variable of BILLING_CREDENTIAL_VARIABLES) if (process.env[variable]) console.log(`WARN billing.api_credential_detected: ${variable} is set in this shell; Architect Code Coductor removes it from provider processes (subscription-first), but other tools may still use it. Value is intentionally not displayed.`);
+  for (const variable of BILLING_ROUTING_VARIABLES) if (process.env[variable]) console.log(`WARN billing.provider_selection_detected: ${variable} is set in this shell and selects a separately billed provider, endpoint or credential; Architect Code Coductor removes it from provider processes (subscription-first). Value is intentionally not displayed.`);
   if (hasCommand('gh')) console.log(`${githubAuthStatus(root).ok ? 'OK' : 'WARN'} github-auth`);
   if (hasCommand('apm')) { console.log(`${apmTargets(root).ok ? 'OK' : 'WARN'} apm-targets`); console.log(`${apmLockPresent(root) ? 'OK' : 'WARN'} apm-lock`); }
   const inventory = inventoryNativeCustomizations(root);
@@ -194,7 +194,7 @@ async function doctor(root: string): Promise<number> {
   try {
     for (const name of ['roles', 'risk', 'capabilities', 'authorities', 'gates', 'mcp-catalog', 'references'] as const) loadConfiguration(root, name);
     console.log('OK packaged runtime configuration (not source-repository scaffold validation)');
-    if (isCodeConductorSource(root)) console.log('INFO source-repository: run `ccon validate .` for the strict Code Conductor configuration/scaffold check.');
+    if (isCodeConductorSource(root)) console.log('INFO source-repository: run `ccon validate .` for the strict Architect Code Coductor configuration/scaffold check.');
   } catch (error) { console.error(error instanceof Error ? error.message : String(error)); configStatus = 1; }
   return missingRequired || configStatus !== 0 ? 1 : 0;
 }
@@ -252,7 +252,7 @@ async function harnessSmoke(args: string[]): Promise<number> {
     }
   }
   // The smoke test runs the provider for real: the same refusal as a run. In a repository,
-  // against its top level and against the folder Code Conductor was started in (a
+  // against its top level and against the folder Architect Code Coductor was started in (a
   // folder's own Git metadata, such as core.worktree, can move the top level elsewhere).
   // Outside one, against that folder, for a relative value, which names a place in it.
   const started = process.cwd();
@@ -267,7 +267,7 @@ async function harnessSmoke(args: string[]): Promise<number> {
   if (adapter.authStatus) {
     const auth = await adapter.authStatus();
     if (auth.state !== 'authenticated') { console.error(`BLOCKED: ${harness} is not signed in (\`${formatCommand(auth.command)}\` reported ${auth.state}). Sign in with the official client first; \`ccon doctor\` shows how.`); return 1; }
-    if (auth.billing !== 'subscription') { console.error(`BLOCKED: ${harness} is signed in with ${printable(auth.method ?? 'an unrecognised method')}, which ${auth.billing === 'separately_billed' ? 'is billed separately from your subscription' : 'Code Conductor cannot confirm as subscription billing'}. Sign in with your subscription first.`); return 1; }
+    if (auth.billing !== 'subscription') { console.error(`BLOCKED: ${harness} is signed in with ${printable(auth.method ?? 'an unrecognised method')}, which ${auth.billing === 'separately_billed' ? 'is billed separately from your subscription' : 'Architect Code Coductor cannot confirm as subscription billing'}. Sign in with your subscription first.`); return 1; }
   }
 
   // Trust is recorded for the version that ran, so it must not change during the test.
@@ -347,13 +347,13 @@ function nextCommand(args: string[]): number {
     if (args.includes('--json')) { console.log(terminalSafeJson({ runId: manifest.runId, mergeDecision: manifest.mergeDecision, nextActions: actions.map(presentAction) })); return 0; }
     // Everything taken from the run record is untrusted (runs can be imported): each
     // value is printed on one line, so it can neither rewrite the terminal nor forge a
-    // step or a command line. Only Code Conductor starts a `$` line, with argv it built
+    // step or a command line. Only Architect Code Coductor starts a `$` line, with argv it built
     // and quoted for this platform's shell (nextActions drops commands it cannot show exactly).
     console.log(`Run ${printable(manifest.runId)}: ${manifest.mergeDecision ? `${printable(manifest.mergeDecision.decision)} — ${printable(manifest.mergeDecision.rationale)}` : 'planned (not executed)'}`);
     if (!actions.length) console.log(manifest.mergeDecision ? 'No further step is needed from you for this run.' : 'No next action recorded. Dry-run plans execute nothing; use `ccon run --execute` from an interactive terminal.');
     const prompt = DEFAULT_SHELL === 'powershell' ? 'PS>' : '$';
     for (const [index, action] of actions.entries()) {
-      // Titles and details mix Code Conductor's text with record values; control and format
+      // Titles and details mix Architect Code Coductor's text with record values; control and format
       // characters are replaced, and non-ASCII (such as its own separators) is kept readable.
       console.log(`\n${index + 1}. ${printable(action.title, 600, false)} [${action.surface}]\n   ${printable(action.detail, 2000, false)}`);
       if (action.path) console.log(`   path: ${printable(action.path)}`);
@@ -397,7 +397,7 @@ function worktreesCommand(args: string[]): number {
       catch (error) { failures += 1; console.log(`KEPT ${where}: ${printable(error instanceof Error ? error.message : String(error))}`); }
     }
   }
-  if (!seen.size) console.log('No Code Conductor agent worktrees recorded in stored runs.');
+  if (!seen.size) console.log('No Architect Code Coductor agent worktrees recorded in stored runs.');
   else if (!removeClean) console.log('Worktrees are kept until you remove them. `ccon worktrees --remove-clean` removes only CLEAN ones (ignored files in them are deleted too) and keeps their branches; review the others in Source Control first.');
   return failures ? 1 : 0;
 }
@@ -507,8 +507,8 @@ function importRun(args: string[]): number {
     return 1;
   }
 }
-// Selection only: Code Conductor starts no MCP server and grants no authority (I08, #40).
-const MCP_SELECTION_NOTE = 'Selected by repository profile only. Code Conductor starts no MCP server and grants no authority: each native client activates, authenticates and authorizes its own servers. A listed server is not verified to work on this workstation until its profile is validated (W-004).';
+// Selection only: Architect Code Coductor starts no MCP server and grants no authority (I08, #40).
+const MCP_SELECTION_NOTE = 'Selected by repository profile only. Architect Code Coductor starts no MCP server and grants no authority: each native client activates, authenticates and authorizes its own servers. A listed server is not verified to work on this workstation until its profile is validated (W-004).';
 function mcpList(args: string[]): number {
   const root = resolve(getOption(args, '--repo') ?? '.'); const catalog = loadMcpCatalog(root);
   const profiles = getOption(args, '--profiles')?.split(',').filter(Boolean) ?? detectRepositoryProfiles(root); const allowApi = args.includes('--allow-api');
@@ -610,7 +610,7 @@ function compressFile(args: string[]): number {
     return 1;
   }
 }
-function usage(): void { console.log('Usage: ccon <validate|workspace-validate|doctor|plan|run|next|handoff|worktrees|runs|gate-output|harness-smoke|mcp|agents|import|apm-catalog|apm-preview|apm-audit|github-gate|context-stats|pr|compress|version> [options]\n\nplan/run accept optional --specializations <comma,separated,hints>; otherwise routing uses the small inspectable objective-signal map in config/capabilities.yaml.\n\nrun defaults to dry-run; pass --execute only after surface-specific harness smoke passes. A provider starts only when its smoke test passed for the installed client version and its official client reports a subscription sign-in (codex login status, claude auth status, kiro-cli whoami); ccon doctor shows installed, signed-in, healthy and trusted separately. --gate-profiles <a,b> chooses deterministic gate profiles for the validator instead of detection (for example terraform,terraform-plan; plan review is never detected, and advisory profiles alone never establish readiness). Executing runs ask in this terminal before each consequential action (starting a provider, disclosing context to it, running gate commands, committing) and bind the approval to the exact recipient, revision, content and diff; a non-interactive run cannot approve and those actions fail closed. Modifying worktrees are preserved by default; pass --cleanup-worktrees only to remove clean worktrees after the run. --tool-output <bounded|summary> chooses how gate output appears in evidence: bounded (default) shows the first 8000 characters; summary is an explicit opt-in that shows a deterministic summary made only of the output\'s own lines (head, tail, counts, failure blocks, error-looking lines; everything left out is counted). In both modes the full output is stored privately with the run and the record ends with its path and SHA-256; the verdict comes from the exit status, never from the text shown. --approval-ttl <minutes> (default 15, at most 1440) is how long each approval prompt waits for you before it expires; it changes nothing about what the approval binds.\n\nKiro ACP smoke requires --ack-kiro-policy after reading the current Kiro subscription/automation policy; run read smoke before modify smoke.\n\ncompress <file> defaults to lossless preparation scoped to --root <dir> (default: current directory), and reads files only on Linux (including WSL), where the opened file\'s location can be verified. Use --aggressive only when comment/whitespace removal is explicitly acceptable.\n\napm-catalog --repo <dir> fetches canonical public pack names/tagged versions on request, with exact locally present versions marked. --select <id> refetches authoritative membership and validates immutable selected metadata. Candidate metadata only: no install, provider or project writes.\n\napm-preview --repo <dir> --packs <catalog-name[,catalog-name]> downloads only the reviewed TypeScript/GitHub engineer packs and prints exact selected Codex projection comparisons. Requires local Linux, APM 0.33.0 and bubblewrap. Staged audit is not a customer deployment audit; nothing is installed or removed in the selected repository. See docs/APM-WORKFLOWS.md.\n\nagents [--repo <dir>] [--json] lists provider-native agents and skills (project and user scope) read-only, marking project files APM did not deploy.\n\nmcp [--repo <dir>] [--profiles <a,b>] [--allow-api] prints, as JSON, the MCP servers selected for the repository\'s profiles (detected unless --profiles is given). Selection only: Code Conductor starts none, and each native client activates and authorizes its own. Separately billed servers are listed only with --allow-api.\n\nimport <run-manifest.json> [--source <label>] [--force] validates an external RunManifest (for example from Code Workflow) and stores it in the private run store as import-<runId>; manifests carrying a mergeDecision or a ready recommendation are rejected.\n\nnext [--run <runId>] [--json] shows the next native steps for the latest (or given) run: review in Source Control, approve in an interactive terminal, validate a harness, hand off manually, or open a draft PR yourself. Commands are shown, never executed.\n\nhandoff --run <runId> --assignment <id> prints the exact prompt for an assignment you will complete in an official client yourself.\n\nworktrees [--run <runId>] [--remove-clean] lists agent worktrees recorded by runs (CLEAN, or KEEP with the reason; branch, base, run). Worktrees are kept by default; --remove-clean removes only CLEAN ones (content-exact, on their own cc/ branch) and keeps their branches and commits. No Git runs in worktrees of a run that stopped for a Git configuration change (INSPECT) or has no outcome yet (ACTIVE).\n\nruns [--older-than <days> [--apply]] lists stored runs, or previews/deletes local run evidence older than the given age. Runs whose worktrees still exist are kept.\n\ngate-output --evidence <E-id> [--run <runId>] [--stderr] prints a gate\'s stored full output (stdout, or stderr with --stderr) after checking it against the digests stored with it and against the evidence digest in the manifest; altered output is refused.\n\nhandoff --json prints the handoff packet for that assignment (recipient, expiry, prior findings, disagreements, provenance); expired packets are refused.\n\ngithub-gate [--repo <dir>] [--pr <number|url|branch>] [--json] summarizes native GitHub state for a pull request (checks, reviews, stale approvals, merge state) read-only, and exits 0 only when every signal is green.\n\npr [--run <runId>] [--assignment <id>] [--base main] [--remote origin] [--title <text>] [--create] previews the draft pull request for a run\'s agent branch. With --create it asks in this terminal, then pushes that exact commit (never forced, no hooks) with your own Git credentials and opens a draft with gh. Branches whose history touches sensitive paths or adds credential-looking strings are refused.'); }
+function usage(): void { console.log('Usage: ccon <validate|workspace-validate|doctor|plan|run|next|handoff|worktrees|runs|gate-output|harness-smoke|mcp|agents|import|apm-catalog|apm-preview|apm-audit|github-gate|context-stats|pr|compress|version> [options]\n\nplan/run accept optional --specializations <comma,separated,hints>; otherwise routing uses the small inspectable objective-signal map in config/capabilities.yaml.\n\nrun defaults to dry-run; pass --execute only after surface-specific harness smoke passes. A provider starts only when its smoke test passed for the installed client version and its official client reports a subscription sign-in (codex login status, claude auth status, kiro-cli whoami); ccon doctor shows installed, signed-in, healthy and trusted separately. --gate-profiles <a,b> chooses deterministic gate profiles for the validator instead of detection (for example terraform,terraform-plan; plan review is never detected, and advisory profiles alone never establish readiness). Executing runs ask in this terminal before each consequential action (starting a provider, disclosing context to it, running gate commands, committing) and bind the approval to the exact recipient, revision, content and diff; a non-interactive run cannot approve and those actions fail closed. Modifying worktrees are preserved by default; pass --cleanup-worktrees only to remove clean worktrees after the run. --tool-output <bounded|summary> chooses how gate output appears in evidence: bounded (default) shows the first 8000 characters; summary is an explicit opt-in that shows a deterministic summary made only of the output\'s own lines (head, tail, counts, failure blocks, error-looking lines; everything left out is counted). In both modes the full output is stored privately with the run and the record ends with its path and SHA-256; the verdict comes from the exit status, never from the text shown. --approval-ttl <minutes> (default 15, at most 1440) is how long each approval prompt waits for you before it expires; it changes nothing about what the approval binds.\n\nKiro ACP smoke requires --ack-kiro-policy after reading the current Kiro subscription/automation policy; run read smoke before modify smoke.\n\ncompress <file> defaults to lossless preparation scoped to --root <dir> (default: current directory), and reads files only on Linux (including WSL), where the opened file\'s location can be verified. Use --aggressive only when comment/whitespace removal is explicitly acceptable.\n\napm-catalog --repo <dir> fetches canonical public pack names/tagged versions on request, with exact locally present versions marked. --select <id> refetches authoritative membership and validates immutable selected metadata. Candidate metadata only: no install, provider or project writes.\n\napm-preview --repo <dir> --packs <catalog-name[,catalog-name]> downloads only the reviewed TypeScript/GitHub engineer packs and prints exact selected Codex projection comparisons. Requires local Linux, APM 0.33.0 and bubblewrap. Staged audit is not a customer deployment audit; nothing is installed or removed in the selected repository. See docs/APM-WORKFLOWS.md.\n\nagents [--repo <dir>] [--json] lists provider-native agents and skills (project and user scope) read-only, marking project files APM did not deploy.\n\nmcp [--repo <dir>] [--profiles <a,b>] [--allow-api] prints, as JSON, the MCP servers selected for the repository\'s profiles (detected unless --profiles is given). Selection only: Architect Code Coductor starts none, and each native client activates and authorizes its own. Separately billed servers are listed only with --allow-api.\n\nimport <run-manifest.json> [--source <label>] [--force] validates an external RunManifest (for example from Code Workflow) and stores it in the private run store as import-<runId>; manifests carrying a mergeDecision or a ready recommendation are rejected.\n\nnext [--run <runId>] [--json] shows the next native steps for the latest (or given) run: review in Source Control, approve in an interactive terminal, validate a harness, hand off manually, or open a draft PR yourself. Commands are shown, never executed.\n\nhandoff --run <runId> --assignment <id> prints the exact prompt for an assignment you will complete in an official client yourself.\n\nworktrees [--run <runId>] [--remove-clean] lists agent worktrees recorded by runs (CLEAN, or KEEP with the reason; branch, base, run). Worktrees are kept by default; --remove-clean removes only CLEAN ones (content-exact, on their own cc/ branch) and keeps their branches and commits. No Git runs in worktrees of a run that stopped for a Git configuration change (INSPECT) or has no outcome yet (ACTIVE).\n\nruns [--older-than <days> [--apply]] lists stored runs, or previews/deletes local run evidence older than the given age. Runs whose worktrees still exist are kept.\n\ngate-output --evidence <E-id> [--run <runId>] [--stderr] prints a gate\'s stored full output (stdout, or stderr with --stderr) after checking it against the digests stored with it and against the evidence digest in the manifest; altered output is refused.\n\nhandoff --json prints the handoff packet for that assignment (recipient, expiry, prior findings, disagreements, provenance); expired packets are refused.\n\ngithub-gate [--repo <dir>] [--pr <number|url|branch>] [--json] summarizes native GitHub state for a pull request (checks, reviews, stale approvals, merge state) read-only, and exits 0 only when every signal is green.\n\npr [--run <runId>] [--assignment <id>] [--base main] [--remote origin] [--title <text>] [--create] previews the draft pull request for a run\'s agent branch. With --create it asks in this terminal, then pushes that exact commit (never forced, no hooks) with your own Git credentials and opens a draft with gh. Branches whose history touches sensitive paths or adds credential-looking strings are refused.'); }
 
 const [command = 'help', ...args] = process.argv.slice(2); let exitCode = 0;
 switch (command) {

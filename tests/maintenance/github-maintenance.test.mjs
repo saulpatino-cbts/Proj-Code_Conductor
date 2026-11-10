@@ -141,6 +141,7 @@ test('stale leases and failed read-back are failures, never successful cleanup',
 });
 test('strict command-line parser defaults to dry-run and rejects malformed input', () => {
   assert.equal(Boolean(parseArgs(['project']).options.apply), false);
+  assert.equal(parseArgs(['project']).options.title, 'Architect Code Coductor - Features');
   assert.equal(parseArgs(['project', '--apply']).options.apply, true);
   for (const args of [[], ['other'], ['project', '--project', 'NaN'], ['project', '--owner'], ['branches', '--force'], ['project', '--repository', 'owner/repo;echo']]) assert.throws(() => parseArgs(args));
 });

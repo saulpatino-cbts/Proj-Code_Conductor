@@ -1,6 +1,6 @@
 # GitHub repository governance
 
-This document defines the desired GitHub repository settings for Code Conductor. Repository settings are enforcement configuration; committed workflows and `AGENTS.md` remain the auditable policy source.
+This document defines the desired GitHub repository settings for Architect Code Coductor. Repository settings are enforcement configuration; committed workflows and `AGENTS.md` remain the auditable policy source.
 
 ## `main` baseline
 
@@ -40,7 +40,7 @@ When supported by the repository/plan and admin tooling:
 
 ## Current automation boundary
 
-Repository rulesets/branch protection and repository-level settings require GitHub administration capabilities. Code Conductor must not simulate those controls in prompts. If automation cannot configure them through an authorized GitHub administration channel, track the setting as an explicit repository-governance task rather than claiming it is enforced.
+Repository rulesets/branch protection and repository-level settings require GitHub administration capabilities. Architect Code Coductor must not simulate those controls in prompts. If automation cannot configure them through an authorized GitHub administration channel, track the setting as an explicit repository-governance task rather than claiming it is enforced.
 
 ## Required checks
 
@@ -53,7 +53,7 @@ branch's, and a category a pull request skips leaves its `CodeQL` check neutral
 
 | Check name (as GitHub shows it) | Workflow |
 |---|---|
-| `quality` | Code Conductor CI: audit, typecheck, tests, repository validation |
+| `quality` | `Code Conductor CI` workflow: audit, typecheck, tests, repository validation |
 | `audit` | APM audit: package, lockfile, policy, projections, drift |
 | `lockfile` | npm lockfile validation |
 | `VSIX packaging preflight` | Release preflight: package and installed-package smoke test |
@@ -66,7 +66,7 @@ up to date usually forces that push anyway.
 
 ## Owner setup (requires repository administration)
 
-Code Conductor cannot apply these settings itself. The owner applies them, then reads them
+Architect Code Coductor cannot apply these settings itself. The owner applies them, then reads them
 back so this document can be checked against the live state (#3).
 
 [`scripts/owner/Set-RepositoryGovernance.ps1`](../scripts/owner/README.md) applies steps 1 to 5

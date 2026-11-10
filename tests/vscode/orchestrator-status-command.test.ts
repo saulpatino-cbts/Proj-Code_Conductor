@@ -176,7 +176,7 @@ describe('Orchestrator status command snapshots', () => {
     const report = orchestratorStatusText('/repo', { targets: [], packs: [], diagnostics: [] });
     expect(report).toContain('Observed at: 2026-11-05T12:00:00.000Z');
     expect(report).toContain('does not auto-refresh');
-    expect(report).toContain('rerun "Code Conductor: Inspect Orchestrator Status"');
+    expect(report).toContain('rerun "Architect Code Coductor: Inspect Orchestrator Status"');
     expect(report).toContain('Approved AI review: pending / not run.');
     expect(report).toContain('Runtime blueprint consumption: unknown');
   });

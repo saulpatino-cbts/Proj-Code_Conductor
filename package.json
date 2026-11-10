@@ -18,7 +18,7 @@
     "test:watch": "vitest",
     "ccon:validate": "npm run build && node packages/cli/dist/index.js validate .",
     "ccon:doctor": "npm run build && node packages/cli/dist/index.js doctor .",
-    "ccon:plan": "npm run build && node packages/cli/dist/index.js plan --repo . --risk R1 --objective 'Validate Code Conductor planning'",
+    "ccon:plan": "npm run build && node packages/cli/dist/index.js plan --repo . --risk R1 --objective 'Validate Architect Code Coductor planning'",
     "build:ts": "npm run defaults:package && tsc -b",
     "build:vscode": "node scripts/build-vscode.mjs && node scripts/verify-vscode-bundle.mjs && node scripts/smoke-vscode-bundle.mjs",
     "package:vscode": "npm run build && node scripts/package-vscode.mjs",

@@ -6,14 +6,14 @@ Implements I05 from #32/#37. Decision: D-063. Contract: `HandoffPacket` in
 ## Handoff packets
 
 When an assignment depends on completed work, such as a reviewer or challenger after the
-builder, Code Conductor builds a versioned **handoff packet** for that one recipient.
+builder, Architect Code Coductor builds a versioned **handoff packet** for that one recipient.
 Only the assignments it depends on contribute. The packet records:
 
 - **Recipient and senders:** the assignment, agent, provider, harness and surface of each.
 - **Expiry:** 24 hours by default (`handoffTtlMs`). An expired packet is never handed off.
 - **Authorised context:**
   - the task objective, acceptance criteria and constraints;
-  - the files Code Conductor committed for earlier modifying assignments (a read-only
+  - the files Architect Code Coductor committed for earlier modifying assignments (a read-only
     assignment's own claim to have changed files is not carried);
   - what they did not verify (`notVerified`);
   - the risks they named.
@@ -32,12 +32,12 @@ Everything earlier agents wrote is untrusted. So the packet is handled like this
   `END HANDOFF <id>`. The packet id is random and created after those agents finished,
   so none of them can close the block early.
 - **Every value they wrote is a JSON string on its own labelled line.** Control, format
-  and line-separator characters are escaped, and Code Conductor's result marker is
+  and line-separator characters are escaped, and Architect Code Coductor's result marker is
   neutralised.
 - **The block is labelled as claims to verify,** not evidence and not instructions. It
   is bounded to 8,000 characters of their data, plus at most 1,000 characters of evidence
   ids in the provenance line. It always ends with its provenance and `END` marker before
-  Code Conductor's own instructions.
+  Architect Code Coductor's own instructions.
 
 Because the prompt includes the packet, the recipient's context-disclosure approval binds
 it too. The approval names it: its id, digest, senders, the counts of findings, risks,

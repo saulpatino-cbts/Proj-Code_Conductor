@@ -133,7 +133,7 @@ cat > credential.json <<'EOF'
   "issuer": "https://token.actions.githubusercontent.com",
   "subject": "repo:saulpatinojr@34853639/Proj-Code_Conductor@1365370915:environment:marketplace",
   "audiences": ["api://AzureADTokenExchange"],
-  "description": "Code Conductor Release workflow, marketplace environment"
+  "description": "Architect Code Coductor Release workflow, marketplace environment"
 }
 EOF
 az ad app federated-credential create --id <object-id> --parameters credential.json

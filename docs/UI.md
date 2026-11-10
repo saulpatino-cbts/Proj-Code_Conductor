@@ -1,6 +1,6 @@
 # VS Code cockpit
 
-Code Conductor v0.1 uses a thin VS Code extension rather than a replacement chat interface.
+Architect Code Coductor v0.1 uses a thin VS Code extension rather than a replacement chat interface.
 
 ## Activity Bar views
 
@@ -12,7 +12,7 @@ Three views. Every row either opens the file it comes from, opens a run's summar
 
 ## Commands
 
-Refresh local discovery, refresh runs, Doctor, repository validation, task planning (objective and risk class, with each class explained), the decision register, and the internal commands the views use (open run summary, perform next action, open configuration file, sign-in guidance). Execution remains in the Code Conductor CLI and official vendor clients: `ccon run … --execute` runs in a terminal, where each consequential step asks for approval. Terminal output, source control, diffs, GitHub PRs, and native agent sessions stay in their existing VS Code surfaces.
+Refresh local discovery, refresh runs, Doctor, repository validation, task planning (objective and risk class, with each class explained), the decision register, and the internal commands the views use (open run summary, perform next action, open configuration file, sign-in guidance). Execution remains in the Architect Code Coductor CLI and official vendor clients: `ccon run … --execute` runs in a terminal, where each consequential step asks for approval. Terminal output, source control, diffs, GitHub PRs, and native agent sessions stay in their existing VS Code surfaces.
 
 ## Deliberate non-features
 
@@ -24,7 +24,7 @@ Refresh local discovery, refresh runs, Doctor, repository validation, task plann
 
 ## Repository selection and refresh
 
-Multi-root workspaces require **Code Conductor: Select Repository** before scoped
+Multi-root workspaces require **Architect Code Coductor: Select Repository** before scoped
 commands or run navigation. Foreign, legacy and missing-repository manifests are
 excluded from the selected repository; their local records remain available via
 the CLI. Repository association is never inferred from an objective.

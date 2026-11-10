@@ -2,7 +2,7 @@
 
 Related: #39, #42, #45, #55 and delivery #56.
 
-Code Conductor commands use VS Code ProcessExecution tasks with an argument vector,
+Architect Code Coductor commands use VS Code ProcessExecution tasks with an argument vector,
 not strings injected into an interactive shell. A fixed Node bootstrap decodes the
 working directory and argument vector after task-variable substitution; raw user data
 is not given to the task resolver. Objective text, task-variable markers, spaces, quotes

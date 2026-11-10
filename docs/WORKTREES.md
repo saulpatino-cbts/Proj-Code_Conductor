@@ -9,7 +9,7 @@ C02 approvals ([`APPROVALS.md`](APPROVALS.md)) and C03 native review
 Every modifying assignment gets its own linked Git worktree. It lives under
 `~/.code-conductor/worktrees` (or `$CODE_CONDUCTOR_HOME/worktrees`) on a
 `cc/<task>/<agent>` branch created from the repository's HEAD. Your checkout, its index
-and your branches are never modified. Code Conductor refuses to commit anywhere that is
+and your branches are never modified. Architect Code Coductor refuses to commit anywhere that is
 not its own agent worktree on its own agent branch (#48).
 
 The run manifest records each worktree's path, branch and base (`RunManifest.worktrees`).
@@ -17,7 +17,7 @@ The run manifest records each worktree's path, branch and base (`RunManifest.wor
 
 ## Commits
 
-Code Conductor commits agent changes only after a commit approval bound to the exact tree.
+Architect Code Coductor commits agent changes only after a commit approval bound to the exact tree.
 It commits that tree with its own identity, never signed with your key, and never runs
 repository hooks. Before asking, it refuses two kinds of change:
 
@@ -34,13 +34,13 @@ repository hooks. Before asking, it refuses two kinds of change:
   same path are not reported. A refusal leaves the changes uncommitted in the worktree
   for you to review. If a finding is a false positive, commit it yourself after review.
 - **Content it could not scan.** One scan reads at most 64 MiB. Files past that budget are
-  named, and Code Conductor refuses to commit them rather than pass them unscanned.
+  named, and Architect Code Coductor refuses to commit them rather than pass them unscanned.
 
 The same checks cover commits the agent made itself. Every path any of them touched is
 checked, and every file version they introduced is scanned, so a credential that a later
 commit removed is still found: its content stays in history. Their commit messages and
 author fields are scanned too, because a push publishes them. Such a branch is blocked,
-and Code Conductor commits nothing on top. There is no commit-count limit; history past
+and Architect Code Coductor commits nothing on top. There is no commit-count limit; history past
 the scan budget is blocked too.
 
 GitHub push protection and your secret scanning service remain the native, authoritative
@@ -62,7 +62,7 @@ discarded.
 
 A worktree is clean only when all of the following hold:
 
-- it is a linked worktree under the Code Conductor root, after resolving symlinks;
+- it is a linked worktree under the Architect Code Coductor root, after resolving symlinks;
 - it has exactly its own `cc/` agent branch checked out, so no commit in it is left
   reachable from no branch (a detached HEAD or another branch keeps it);
 - its content matches that branch's head exactly. This is compared by content, not by
@@ -89,7 +89,7 @@ with its empty branch, unless Git configuration had already changed.
 Git enters a repository nested in a work tree: `git status`, `git add` and `git diff` run
 inside a checked-out submodule, under that repository's own configuration, filters
 included. An agent could therefore plant a repository whose configuration runs its
-program the moment Code Conductor checks the worktree, outside the provider's sandbox.
+program the moment Architect Code Coductor checks the worktree, outside the provider's sandbox.
 So:
 
 - New agent worktrees never get submodules checked out (`submodule.recurse=false`).
@@ -103,7 +103,7 @@ So:
   repository`), without checking its content.
 - `git status` runs with `--ignore-submodules=all` everywhere, and a push never recurses
   into submodules.
-- Code Conductor never commits a nested repository: a commit whose tree adds or changes a
+- Architect Code Coductor never commits a nested repository: a commit whose tree adds or changes a
   gitlink is refused before approval, including one Git did not list as a nested
   repository (for example under paths the agent staged).
 
@@ -111,7 +111,7 @@ Repositories nested in your own checkout before a run (your submodules) are your
 their configuration is part of the run's starting state, and changing it during the run
 stops the run.
 
-Every Code Conductor Git call uses `git` from an absolute `PATH` entry, never one found in
+Every Architect Code Coductor Git call uses `git` from an absolute `PATH` entry, never one found in
 the worktree it runs in: on Windows a bare program name is looked up in the working
 directory first, and on POSIX an empty or relative `PATH` entry does the same. The
 programs Git starts itself (`ssh`, filters, credential helpers) get the same `PATH`, with

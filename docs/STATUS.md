@@ -1,4 +1,4 @@
-# Code Conductor working status
+# Architect Code Coductor working status
 
 Release status checked 2026-11-10 (UTC); earlier feature validation dates remain
 as recorded below. This document distinguishes merged development work,
@@ -6,6 +6,15 @@ prepared changes and released/workstation evidence. GitHub and executable
 validation remain authoritative; issue scope alone is not completion.
 
 ## Current position
+
+**Product priority:** cloud architects are the primary audience; the target
+workflow and current capability limits are recorded in
+[`ARCHITECT-WORKFLOW.md`](ARCHITECT-WORKFLOW.md) and accepted ADR 0020 / D-081.
+This direction does not make cloud-specific research, diagrams, IaC proposals,
+or independent cloud-architecture assessments shipped capabilities. The
+architect-prioritized [open-issue assessment](ARCHITECT-ISSUE-PRIORITIES.md)
+records which open work is feasible now. The historical 0.1.3 release and
+validation evidence below retain their original compatibility identity.
 
 **0.1.3 is published on GitHub. Reliability, stored execution monitoring, optional
 pack provenance/audit and read-only local knowledge navigation are merged on
@@ -26,10 +35,12 @@ main. The full workstreams and release validation are not complete.**
 
 The v0.1.3 [release workflow](https://github.com/saulpatinojr/Proj-Code_Conductor/actions/runs/42345472964)
 completed candidate, attestation and draft jobs, but its Marketplace publish job
-failed at **Publish the verified package**. GitHub release publication does not
-prove Marketplace availability. The publication failure cause, Marketplace
-listing and clean-machine installation remain unverified; no retry or release
-was initiated by this status check. Marketplace prerelease packaging remains
+failed at **Publish the verified package**. The run log shows Azure OIDC login
+succeeded, then the Marketplace publisher denied the principal permission to
+publish new extensions to `hybridcloudworks`. GitHub release publication does
+not prove Marketplace availability. Marketplace listing and clean-machine
+installation remain unverified; no permission change, retry or publication was
+initiated by this status check. Marketplace prerelease packaging remains
 separate work under #14.
 
 ## Merged evidence recovery
@@ -142,8 +153,10 @@ open. See [APM workflows](APM-WORKFLOWS.md).
 - #137/#138 capture additional Second Brain/sidebar requests. Cloud sync needs
   separate reviewed architecture and protected deployment gates; it is not
   activated by the local adapter.
-- #14 remains the Marketplace/release-engineering path. Recheck publisher/Entra
-  configuration before acting; existing `v0.1.2` is not an uncreated tag.
+- #14 remains the Marketplace/release-engineering path. The v0.1.3 GitHub
+  release exists, but its Marketplace publish was denied for publisher
+  permission; recheck current owner/Entra authorization before any separately
+  approved publication action.
 
 ## Limits to retain
 

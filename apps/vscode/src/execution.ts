@@ -14,7 +14,7 @@ const BOOTSTRAP = [
 
 /** No shell source or task-variable syntax is derived from user-controlled data. */
 export function cliProcessSpec(root: string, runtime: string, args: readonly string[], trusted: boolean): CliProcessSpec {
-  if (!trusted) throw new Error('Trust this workspace through VS Code before running Code Conductor commands.');
+  if (!trusted) throw new Error('Trust this workspace through VS Code before running Architect Code Coductor commands.');
   if (!isAbsolute(root) || !isAbsolute(runtime)) throw new Error('Workspace and bundled runtime must be absolute paths.');
   if ([root, runtime, ...args].some((value) => typeof value !== 'string' || value.includes('\0'))) {
     throw new Error('Process arguments must be strings without null bytes.');

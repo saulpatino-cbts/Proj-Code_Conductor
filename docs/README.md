@@ -1,6 +1,8 @@
-# Code Conductor documentation
+# Architect Code Coductor documentation
 
-This directory contains the maintained design, operating, and validation documentation for Code Conductor.
+This directory contains maintained design, operating, and validation
+documentation for Architect Code Coductor. The architect-first workflow and
+shipped-versus-direction boundaries have one authoritative home.
 
 ## Start here
 
@@ -9,10 +11,13 @@ This directory contains the maintained design, operating, and validation documen
 - [`../STARTER.md`](../STARTER.md) — concise continuity handoff for a new work session.
 - [`STATUS.md`](STATUS.md) — current implementation checkpoint and next milestone.
 - [`DECISIONS.md`](DECISIONS.md) — durable register of locked decisions and validation facts.
+- [`ARCHITECT-WORKFLOW.md`](ARCHITECT-WORKFLOW.md) — architect-first workflow, evidence standard, current capability boundaries and compatibility naming rules.
+- [`ARCHITECT-ISSUE-PRIORITIES.md`](ARCHITECT-ISSUE-PRIORITIES.md) — architect-prioritized open-issue completion feasibility and priority assessment.
 
 ## Architecture and implementation
 
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) — system boundaries, layers, team model, and source-of-truth architecture.
+- [`adr/0020-architect-first-cloud-architecture-workflow.md`](adr/0020-architect-first-cloud-architecture-workflow.md) — accepted cloud-architect-first product priority.
 - [`IMPLEMENTATION-PLAN.md`](IMPLEMENTATION-PLAN.md) — v0.1 release plan and phased implementation scope.
 - [`UI.md`](UI.md) — VS Code cockpit scope and deliberate non-features.
 
@@ -52,7 +57,10 @@ Repository-wide contributor/review documentation lives at the root or under `.gi
 
 ## Documentation ownership
 
-Avoid duplicating authoritative content. When possible, update the authoritative document and link to it elsewhere. `STATUS.md` is the living checkpoint; `DECISIONS.md` is the durable decision record; `AGENTS.md` is the operating constitution.
+Avoid duplicating authoritative content. When possible, update the authoritative document and link to it elsewhere. `STATUS.md` is the living checkpoint; `DECISIONS.md` is the durable decision
+record; `AGENTS.md` is the operating constitution. The architect workflow doc
+is authoritative for product-facing workflow and capability claims; other
+documents link to it instead of duplicating its full guidance.
 
 ## Optional knowledge navigation
 

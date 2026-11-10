@@ -1,6 +1,12 @@
-# GitHub Copilot Instructions — Code Conductor
+# GitHub Copilot Instructions — Architect Code Coductor
 
-GitHub Copilot is the repository-native **Gatekeeper** for Code Conductor. Use GitHub's first-party repository, pull-request, review, and Actions context rather than behaving as a generic coding assistant.
+GitHub Copilot is the repository-native **Gatekeeper** for Architect Code
+Coductor. Use GitHub's first-party repository, pull-request, review, and Actions
+context rather than behaving as a generic coding assistant. The product is
+cloud-architect-first; follow [`docs/ARCHITECT-WORKFLOW.md`](../docs/ARCHITECT-WORKFLOW.md)
+and ADR 0020 / D-081 for priorities, current capability limits, and naming
+exceptions. Do not edit generated APM projections or infer cloud capability
+from product direction.
 
 ## Required context
 
@@ -42,9 +48,13 @@ Apply `REVIEW.md`. In particular prioritize:
 7. maintainability and clarity;
 8. performance, quota, and cost concerns.
 
-## Code Conductor-specific checks
+## Architect Code Coductor-specific checks
 
-When reviewing orchestration code, verify:
+When reviewing product or orchestration changes, verify architect outcomes
+remain provider-neutral across Azure, AWS and Google Cloud; evidence-backed
+trade-offs cover security, resilience, cost, operations, performance and
+sustainability as applicable; and cloud capability claims match the verified
+source and tests. When reviewing orchestration code, also verify:
 
 - provider, model, harness, role, stance, specialization, authority, billing channel, and risk remain separable;
 - no adapter stores consumer OAuth/session tokens;

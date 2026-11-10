@@ -1,4 +1,4 @@
-# Code Conductor Decision Register
+# Architect Code Coductor Decision Register
 
 This file is the durable record of user-approved architectural decisions. It exists so the project does not depend on chat history or model memory.
 
@@ -92,6 +92,7 @@ This file is the durable record of user-approved architectural decisions. It exi
 | D-078 | Optional knowledge integration uses an explicitly selected local vault/folder and repository-bound, bounded read-only index. Notes are navigation claims; they cannot alter Git/GitHub/APM/runtime authority. No startup scan, automatic note writes, context disclosure or cloud sync. Safe descriptor-bound reads and click-time scope checks remain required; unsupported hosts fail explicitly. See ADR 0016. | LOCKED |
 | D-079 | Optional selected-pack projection preview runs pinned native APM only on explicit request in a Linux bubblewrap write boundary, with fixed reviewed public pins, scripts/executables denied, bounded descriptor-safe comparisons and staged audit. The result is selected Codex projections only: it grants no installation/runtime authority and does not merge metadata or mutate the customer tree. Unsupported hosts fail explicitly. See ADR 0017. | LOCKED |
 | D-080 | Optional APM install/update/removal uses reviewed native generation only in staging, complete per-file ownership/conflict checks, approved exact SHA-256 binary artifacts, isolated Git metadata/configuration/attributes, and deployment-correlated native audit. The selected trusted local Linux terminal must obtain fresh single-use D-059 approval bound to context/types/modes/absence and exact plan; stored/chat approvals grant no customer install authority. No customer-tree native install/reinstall, forced overwrite, provider/MCP/hook activation, index/commit or automatic rollback. Failures remain inspectable; unsupported inputs/hosts fail explicitly. See ADR 0018. | LOCKED |
+| D-081 | Architect Code Coductor is the architect-first product identity and prioritizes a provider-neutral cloud-architecture workflow across Azure, AWS, and Google Cloud. Decisions must expose evidence-backed trade-offs in security, resilience, cost, operations, performance, and sustainability, distinguish current capabilities from direction, and retain deterministic validation and action-specific human approval. Product naming does not rename compatibility identifiers or alter runtime authority/routing. See ADR 0020 and `docs/ARCHITECT-WORKFLOW.md`. | LOCKED |
 
 ## Validated implementation facts
 

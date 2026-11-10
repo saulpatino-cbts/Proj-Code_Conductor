@@ -2,11 +2,11 @@
 
 Implements I03 from #35/#32. Decision: D-064.
 
-GitHub is the native review gate. Code Conductor reads its state and, only when you ask
+GitHub is the native review gate. Architect Code Coductor reads its state and, only when you ask
 and approve, prepares a draft pull request. It never merges, approves, re-runs checks,
 or changes repository settings. Authentication stays with the official clients: your
 own Git credentials for the push and `gh auth` for the GitHub CLI. No webhook server or
-token is stored by Code Conductor.
+token is stored by Architect Code Coductor.
 
 ## Inspect a pull request
 
@@ -37,7 +37,7 @@ ccon pr … --create
 
 Without `--create`, `ccon pr` previews and changes nothing. It runs no Git at all for a run
 that stopped because Git configuration changed, or that has no outcome yet. It uses only
-worktree records on a `cc/` branch under the Code Conductor root. The preview covers the agent
+worktree records on a `cc/` branch under the Architect Code Coductor root. The preview covers the agent
 branch of the latest run (or `--run`), the exact commit, commit count and changed files,
 the push destination, the GitHub repository, and the generated title and body. The body
 holds the run, task, local decision, approvals, assignment table, gates, unverified
@@ -58,7 +58,7 @@ The preview runs no Git command that enters a repository nested in the worktree
 
 With `--create`, in an interactive terminal:
 
-1. It shows the same preview. Code Conductor refuses outright in any of these cases:
+1. It shows the same preview. Architect Code Coductor refuses outright in any of these cases:
    - the branch has no commits since its base;
    - the remote is not a GitHub URL;
    - the remote does not push to exactly one URL. A push goes to every push URL of a
@@ -105,11 +105,11 @@ fails, the branch stays pushed and the command to open the draft yourself is pri
 - Fork workflows, where you push to a fork and open the pull request against upstream,
   need the manual commands for now, and so does a remote whose push and fetch URLs name
   different hosts (for example an SSH host alias for pushes only).
-- Code Conductor checks Git configuration while a run is in progress. It does not detect
+- Architect Code Coductor checks Git configuration while a run is in progress. It does not detect
   changes a process left running after the run makes later; such a process can change
-  any of your configuration, which is outside what Code Conductor contains
+  any of your configuration, which is outside what Architect Code Coductor contains
   ([`APPROVALS.md`](APPROVALS.md)).
 - GitHub Enterprise Server works when `gh` is authenticated to that host. It is not
   validated on a real instance here.
 - Copilot code review, required reviewers and environment protection are configured in
-  GitHub. Code Conductor reports their outcome, it does not request or bypass them.
+  GitHub. Architect Code Coductor reports their outcome, it does not request or bypass them.
