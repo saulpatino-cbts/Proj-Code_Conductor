@@ -16,6 +16,7 @@ import { nextActions, printable, type NextAction } from '@code-conductor/runtime
 import { validateContract } from '@code-conductor/schemas';
 import type { RunManifest } from '@code-conductor/schemas';
 import { nativeOperation, signInHint } from './native-actions.js';
+import { isCatalogVersionId } from '@code-conductor/apm-adapter';
 import { runStartedAt, runSummaryMarkdown, runTitle } from './run-summary.js';
 import * as vscode from 'vscode';
 import { existsSync, lstatSync, readFileSync, readdirSync } from 'node:fs';
@@ -312,7 +313,11 @@ function packNodes(root: string, discovery?: LocalDiscovery): Node[] {
   const inventory = packInventory(root);
   const inspect: vscode.Command = { command: 'codeConductor.inspectPacks', title: 'Inspect pack provenance' };
   const orchestrator: Node = { label: 'Orchestrator status', description: 'read-only · proposal/review pending', tooltip: 'Inspect local pack evidence and interview proposal hashes. Review, accepted baseline, artifact application and runtime use remain separately gated or unknown.', icon: 'checklist', command: { command: 'codeConductor.inspectOrchestrator', title: 'Inspect orchestrator status' } };
-  if (!inventory.manifestSha256 && !inventory.lockSha256 && !inventory.diagnostics.length) return [{ label: 'No APM packaging', description: 'optional', tooltip: 'Basic handoffs work without APM. Click for packaging requirements.', icon: 'package', command: inspect }, orchestrator];
+  const catalogActions: Node[] = [
+    { label: 'Discover public pack catalog', description: 'on demand · read-only', tooltip: 'Explicitly fetch bounded public catalog metadata from the canonical mirror. Results are untrusted candidates, not an integrity, audit, trust or runtime-eligibility claim. No package is installed.', icon: 'search', command: { command: 'codeConductor.discoverPacks', title: 'Discover APM pack catalog' } },
+    { label: 'Validate catalog selection', description: 'on demand · metadata only', tooltip: 'Paste a compound version ID from catalog output. The CLI refetches canonical membership and validates package metadata. Validation does not install a package or establish runtime eligibility.', icon: 'verified', command: { command: 'codeConductor.validatePackSelection', title: 'Validate APM catalog selection' } },
+  ];
+  if (!inventory.manifestSha256 && !inventory.lockSha256 && !inventory.diagnostics.length) return [{ label: 'No APM packaging', description: 'optional', tooltip: 'Basic handoffs work without APM. Click for packaging requirements.', icon: 'package', command: inspect }, ...catalogActions, orchestrator];
   const apmAvailability = discovery?.commands.apm === true
     ? `APM CLI was found at ${discovery.capturedAt}; use Doctor/Refresh to verify current availability.`
     : discovery?.commands.apm === false
@@ -335,6 +340,7 @@ function packNodes(root: string, discovery?: LocalDiscovery): Node[] {
   } catch { /* unavailable is distinct from zero */ }
   return [
     orchestrator,
+    ...catalogActions,
     { label: 'Own skills', description: ownSkills === undefined ? 'unavailable' : String(ownSkills), tooltip: 'Repository-authored skill directories; not an audit or trust claim.', icon: 'extensions', command: inspect },
     ...inventory.packs.map((pack): Node => ({ label: printable(pack.name, 80, false), description: `${pack.state} · ${pack.commit?.slice(0, 12) ?? 'no locked commit'}`, tooltip: `Declared: ${printable(pack.reference, 300, false)}. Lock association only; audit unknown.`, icon: pack.state === 'mismatch' || pack.state === 'unsupported' ? 'warning' : 'package', command: inspect })),
     { label: 'Targets', description: inventory.targets.map((target) => printable(target, 40)).join(', ') || 'none', icon: 'symbol-array', command: openFile(root, 'apm.yml', 'Open apm.yml') },
@@ -794,6 +800,46 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     packs.refresh();
     // Regenerate a new snapshot on each request; never claim an old audit or live state.
     await vscode.window.showTextDocument(document, { preview: true });
+  }));
+  context.subscriptions.push(vscode.commands.registerCommand('codeConductor.discoverPacks', async () => {
+    const r = root();
+    if (!r) {
+      await vscode.window.showWarningMessage('Select an open repository before discovering the APM catalog. Use Architect Code Coductor: Select Repository, then run discovery explicitly.');
+      return;
+    }
+    if (!vscode.workspace.isTrusted) {
+      await vscode.window.showWarningMessage('APM catalog discovery requires a trusted workspace. No catalog request was made.');
+      return;
+    }
+    await runCli(context, r, ['apm-catalog', '--repo', r], 'Architect Code Coductor APM Catalog Discovery');
+  }));
+  context.subscriptions.push(vscode.commands.registerCommand('codeConductor.validatePackSelection', async () => {
+    const r = root();
+    if (!r) {
+      await vscode.window.showWarningMessage('Select an open repository before validating an APM catalog selection. Use Architect Code Coductor: Select Repository, then retry.');
+      return;
+    }
+    if (!vscode.workspace.isTrusted) {
+      await vscode.window.showWarningMessage('APM catalog selection validation requires a trusted workspace. No catalog request was made.');
+      return;
+    }
+    const selection = await vscode.window.showInputBox({
+      title: 'Validate APM Catalog Selection',
+      prompt: 'Paste one compound version ID from the visible catalog output. The CLI refetches canonical membership; this does not install the pack.',
+      placeHolder: 'hybridcloudworks/proj-agentpacks/<pack>@<version>#<40-character-commit>',
+      ignoreFocusOut: true,
+      validateInput: (value) => isCatalogVersionId(value) ? undefined : 'Enter a compound ID copied from catalog output.',
+    });
+    if (!selection) return;
+    if (!isCatalogVersionId(selection)) {
+      await vscode.window.showWarningMessage('Catalog selection is not a valid compound version ID. Copy one ID from the catalog output; no request was made.');
+      return;
+    }
+    if (!sameRepository(root(), r) || !vscode.workspace.isTrusted) {
+      await vscode.window.showWarningMessage('Repository selection or workspace trust changed. Start catalog selection validation again.');
+      return;
+    }
+    await runCli(context, r, ['apm-catalog', '--repo', r, '--select', selection], 'Architect Code Coductor APM Catalog Selection Validation');
   }));
   context.subscriptions.push(vscode.commands.registerCommand('codeConductor.inspectOrchestrator', async () => {
     const r = root(); if (!r) return;

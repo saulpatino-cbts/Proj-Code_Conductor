@@ -120,6 +120,16 @@
         "title": "Architect Code Coductor: Inspect Pack Provenance"
       },
       {
+        "command": "codeConductor.discoverPacks",
+        "title": "Architect Code Coductor: Discover APM Pack Catalog",
+        "icon": "$(search)"
+      },
+      {
+        "command": "codeConductor.validatePackSelection",
+        "title": "Architect Code Coductor: Validate APM Catalog Selection",
+        "icon": "$(verified)"
+      },
+      {
         "command": "codeConductor.auditPacks",
         "title": "Architect Code Coductor: Audit Packs"
       },

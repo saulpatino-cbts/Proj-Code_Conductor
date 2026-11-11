@@ -91,4 +91,4 @@ export {
 export { PREVIEW_PACKS, previewPacks, comparePackProjections, type PreviewPack, type ProjectionPreview, type ProjectionChange } from './projection-preview.js';
 
 export { packInventory, packInventoryText, type PackRecord, type PackInventory } from './pack-state.js';
-export { CATALOG_MIRROR, CATALOG_SOURCE, CatalogError, catalogVersionId, fetchPackCatalog, fetchCatalogSelections, locallyPresentCatalogVersions, type PackCatalog, type CatalogVersion, type CatalogSelection, type InstalledCatalogVersion, type CatalogOptions, type CatalogRequest } from './catalog.js';
+export { CATALOG_MIRROR, CATALOG_SOURCE, CatalogError, catalogVersionId, isCatalogVersionId, fetchPackCatalog, fetchCatalogSelections, locallyPresentCatalogVersions, type PackCatalog, type CatalogVersion, type CatalogSelection, type InstalledCatalogVersion, type CatalogOptions, type CatalogRequest } from './catalog.js';
