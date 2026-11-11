@@ -1,22 +1,34 @@
-# Code Conductor v0.1 Implementation Plan
+# Architect Code Coductor — existing v0.1 foundation plan
 
 ## Goal
 
-Deliver a working orchestration system for VS Code that coordinates existing subscription-backed AI clients and official platform integrations rather than recreating them. The v0.1 design remains workstation-first, provider-neutral, evidence-driven, surface-aware, and safe to extend.
+This plan describes the existing v0.1 workstation/VS Code orchestration
+foundation, not a completed cloud-architecture workflow. The current product
+priority is the cloud-architect lifecycle in
+[`ARCHITECT-WORKFLOW.md`](ARCHITECT-WORKFLOW.md) and ADR 0020 / D-081: provider-
+neutral requirements, official evidence, explicit trade-offs, reviewable
+artifacts, independent challenge, deterministic validation, and human-approved
+handoff. Track open-issue completion feasibility in
+[`ARCHITECT-ISSUE-PRIORITIES.md`](ARCHITECT-ISSUE-PRIORITIES.md).
+
+Deliver the workstation system by coordinating existing subscription-backed AI
+clients and official platform integrations rather than recreating them. The
+v0.1 foundation remains workstation-first, provider-neutral, evidence-driven,
+surface-aware, and safe to extend.
 
 ## Architecture layers
 
 ### 1. Cockpit
 
-VS Code is the primary operator UI. A thin Code Conductor extension exposes Team, Runs, Gates, Connections, Packs, and Usage views and deep-links into native agent sessions, terminals, diffs, Source Control, and GitHub PR tooling.
+VS Code is the primary operator UI. A thin Architect Code Coductor extension exposes Team, Runs, Gates, Connections, Packs, and Usage views and deep-links into native agent sessions, terminals, diffs, Source Control, and GitHub PR tooling.
 
-Code Conductor v0.x does not require a standalone desktop application. An optional thin `ccon` CLI/TUI uses the same versioned core/runtime as the extension.
+Architect Code Coductor v0.x does not require a standalone desktop application. An optional thin `ccon` CLI/TUI uses the same versioned core/runtime as the extension.
 
-The production VS Code package must contain or reliably resolve the compiled Code Conductor runtime required by normal users. Customer repositories must not need this source repository or an `npm run build` step.
+The production VS Code package must contain or reliably resolve the compiled Architect Code Coductor runtime required by normal users. Customer repositories must not need this source repository or an `npm run build` step.
 
 ### 2. Runtime control plane
 
-Code Conductor Core owns:
+Architect Code Coductor Core owns:
 
 - task envelope creation
 - DAG/dependency scheduling
@@ -46,7 +58,7 @@ Initial supported provider lanes:
 
 A harness may independently expose a VS Code/IDE surface, CLI/headless execution, ACP, MCP, platform-native workflow/API, separately billed SDK/API, and/or a manual human-in-the-loop surface. A single generic `cli_preferred` assumption is not sufficient for the long-term adapter model.
 
-Code Conductor must preserve provider-native subagents/agents, skills, hooks, commands/plugins/Powers, permissions, sessions, MCP, and native IDE capabilities where officially supported. Provider-local subagents may operate within an assigned task, while cross-provider AI invocation remains mediated by Code Conductor so authority, billing channel, worktree ownership, evidence, and readiness remain controlled.
+Architect Code Coductor must preserve provider-native subagents/agents, skills, hooks, commands/plugins/Powers, permissions, sessions, MCP, and native IDE capabilities where officially supported. Provider-local subagents may operate within an assigned task, while cross-provider AI invocation remains mediated by Architect Code Coductor so authority, billing channel, worktree ownership, evidence, and readiness remain controlled.
 
 Preserve each vendor's native authentication boundary. AHP or other compatibility layers may be used only behind replaceable adapters and must not become the core orchestration contract.
 
@@ -66,7 +78,7 @@ Kiro may still implement or review code when policy/capability calls for it. Una
 
 ### 4. Context-preparation plane
 
-The first-party context optimizer prepares context already selected by Code Conductor. It is not a scheduler and it does not decide what evidence is authoritative.
+The first-party context optimizer prepares context already selected by Architect Code Coductor. It is not a scheduler and it does not decide what evidence is authoritative.
 
 - lossless/conservative is the default;
 - valid JSON may be compacted semantically;
@@ -85,7 +97,7 @@ Microsoft APM is authoritative for reusable agent-pack dependency/distribution/i
 - `apm.yml` is the project manifest.
 - `apm.lock.yaml` is generated and must never be hand-edited.
 - `apm-policy.yml` controls allowed package/MCP policy.
-- Specialist agents and skills are installed from the Agent Packs repository through APM at a pinned reference; `.apm/` here holds only Code Conductor's own skills, and role rules are rendered by the runtime from `config/roles.yaml` (ADR 0015).
+- Specialist agents and skills are installed from the Agent Packs repository through APM at a pinned reference; `.apm/` here holds only Architect Code Coductor's own skills, and role rules are rendered by the runtime from `config/roles.yaml` (ADR 0015).
 - Copilot/Claude/Codex/Kiro/Antigravity/Agent Skills target directories are materialized projections.
 
 Pinned targets for the foundation are Copilot, Claude, Codex, Kiro, Antigravity, and converged Agent Skills.
@@ -94,7 +106,7 @@ The legacy agent/skill library migration is a dedicated parallel workstream. It 
 
 ### 6. Tool/reference plane
 
-Only vendor-official or explicitly approved Code Conductor first-party MCPs belong in the catalog. Enable them per repository profile, not globally by default.
+Only vendor-official or explicitly approved Architect Code Coductor first-party MCPs belong in the catalog. Enable them per repository profile, not globally by default.
 
 Initial catalog:
 
@@ -106,7 +118,7 @@ Initial catalog:
 - AWS official managed/local MCP tooling when an AWS project requires it
 - Google Cloud managed MCP tooling when a GCP project requires it
 - Perplexity official MCP only when API billing is explicitly enabled
-- Code Conductor context optimizer only under its explicit first-party profile while the adapter remains experimental
+- Architect Code Coductor context optimizer only under its explicit first-party profile while the adapter remains experimental
 
 MCP provides tools/resources. It does not schedule the team.
 
@@ -139,7 +151,7 @@ Primary specialization is a routing preference, not exclusivity.
 
 | Provider / harness | Primary responsibility | Secondary eligible work |
 |---|---|---|
-| Code Conductor | orchestration, routing, risk, authority, evidence, gates, arbitration | coordinates rather than competes |
+| Architect Code Coductor | orchestration, routing, risk, authority, evidence, gates, arbitration | coordinates rather than competes |
 | Kiro | specification/design/task planning, AWS specialist, Kiro-native workflows | implementation, review |
 | Claude Code | large-codebase engineering, refactoring, deep codebase reasoning | implementation, challenger/reviewer |
 | Codex | implementation, debugging, testing, repository execution | review/challenge, focused planning |
@@ -205,7 +217,7 @@ The adapter capability model must evolve to describe provider surfaces and nativ
 
 ## Authentication design
 
-Code Conductor must not store consumer OAuth tokens or impersonate vendor clients.
+Architect Code Coductor must not store consumer OAuth tokens or impersonate vendor clients.
 
 - GitHub/Copilot: official GitHub/VS Code authentication.
 - Claude Code: official Claude account/subscription authentication; warn when API-key environment variables could change billing behavior.
@@ -222,11 +234,11 @@ Do not reduce the product to either "extensions" or "CLIs." Use the best officia
 
 - native IDE extensions are first-class human interaction surfaces;
 - official CLI/headless execution is preferred for machine orchestration when the provider supports it safely;
-- ACP is the preferred Kiro client/harness boundary for Code Conductor where validated;
+- ACP is the preferred Kiro client/harness boundary for Architect Code Coductor where validated;
 - GitHub/Copilot workflow operations use GitHub-native PR/review/Actions semantics;
 - Perplexity Pro remains manual unless official paid MCP/API access is explicitly enabled;
 - deterministic CLIs are governed tools, not peer AI providers;
-- cross-provider AI invocation always returns through Code Conductor assignment/evidence policy.
+- cross-provider AI invocation always returns through Architect Code Coductor assignment/evidence policy.
 
 ## Repository layout
 
@@ -362,7 +374,7 @@ The architecture/runtime/product foundations above are merged. Execute the live 
 4. smoke-test the selected Codex/Claude/Kiro surfaces in read mode, then isolated modify mode; Kiro ACP remains fail-closed until current subscription-policy and authority behavior are proven;
 5. verify only the MCP/reference and deterministic-tool profiles required by the scenario;
 6. exercise context preparation in lossless mode on representative repository inputs;
-7. execute a real R1 task through Code Conductor using an isolated worktree and deterministic validation;
+7. execute a real R1 task through Architect Code Coductor using an isolated worktree and deterministic validation;
 8. raise the same scenario to R2 with a different-provider challenger plus GitHub Gatekeeper review/re-review;
 9. capture structured evidence, resolve defects, and validate cockpit/startup/package behavior against the run;
 10. complete the context-optimizer official MCP SDK/current-protocol gate before calling that adapter GA;
@@ -383,7 +395,7 @@ Pull a parallel item into the active release only when a concrete acceptance cri
 
 ## First dogfood scenario
 
-Use this repository itself. The first real R1/R2 run must exercise the already-built runtime plus the approved surface-aware delta rather than manually reproducing its behavior. A modifying builder works in an isolated worktree, an independent role reviews/challenges it, deterministic gates run, GitHub Gatekeeper reviews the PR, and Code Conductor captures the evidence/readiness result.
+Use this repository itself. The first real R1/R2 run must exercise the already-built runtime plus the approved surface-aware delta rather than manually reproducing its behavior. A modifying builder works in an isolated worktree, an independent role reviews/challenges it, deterministic gates run, GitHub Gatekeeper reviews the PR, and Architect Code Coductor captures the evidence/readiness result.
 
 Kiro should be exercised through the approved ACP/native boundary if selected for the scenario; do not count obsolete generic Kiro execution as proof of the post-ADR design.
 
@@ -391,14 +403,14 @@ Kiro should be exercised through the approved ACP/native boundary if selected fo
 
 A clean workstation must be able to:
 
-- install Code Conductor through the release extension/VSIX path without cloning this repository;
+- install Architect Code Coductor through the release extension/VSIX path without cloning this repository;
 - open an ordinary repository and complete first-run discovery, creating no files in it unless the person opts in (C01);
 - restart VS Code with fast lazy warm-start behavior and no unnecessary provider/MCP/APM launches;
 - verify APM targets for repositories that package agent packs (APM is optional for basic provider handoffs, I07);
 - authenticate supported official clients through their native boundaries;
 - run `ccon doctor` with surface-aware/provider/tool status;
 - safely prepare bounded context;
-- repeat that in a second, unrelated repository that has no Code Conductor files;
+- repeat that in a second, unrelated repository that has no Architect Code Coductor files;
 - execute an R1/R2 task using independent roles and the approved provider surfaces;
 - isolate changes;
 - run deterministic checks;

@@ -12,7 +12,7 @@ export function evidenceText(repository: string, storeRoot: string, manifest: Ru
     const clean = (text: string): string => text.split('\n').map((line) => printable(line, Number.MAX_SAFE_INTEGER, false)).join('\n');
     const verdicts = [...new Set([...manifest.gates, ...manifest.results.flatMap((result) => result.tests)].filter((gate) => gate.evidenceIds.includes(evidenceId)).map((gate) => `${printable(gate.gate, 100, false)}: ${gate.status}`))];
     return [
-      'Code Conductor stored gate output (read-only)',
+      'Architect Code Coductor stored gate output (read-only)',
       `Repository: ${printable(repository, 1000, false)}`,
       `Run: ${manifest.runId} · Evidence: ${evidenceId}`,
       `Source: ${printable(record.source, 1000, false)}`,

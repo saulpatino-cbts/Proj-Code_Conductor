@@ -67,7 +67,7 @@ update planner, contact a provider or write project files. The displayed intervi
 draft hashes describe an unreviewed and unapplied interview-only proposal; this
 inspection does not activate a runtime blueprint or complete #140/#142. Each
 untitled report is a timestamped static snapshot; it does not refresh when local
-inventory or interview data changes, so rerun **Code Conductor: Inspect
+inventory or interview data changes, so rerun **Architect Code Coductor: Inspect
 Orchestrator Status** to obtain a new snapshot.
 
 ## Orchestrator interview preview
@@ -179,7 +179,7 @@ The first fixed-catalog Codex projection comparison is available; complete
 installation diffs including metadata/local source/all targets, digest-bound
 installation approval, audit evidence tied to the actual deployment, and safe
 update/removal are still required. Existing APM owns resolution and lock generation;
-Code Conductor must not hand-edit the lock or overwrite human instructions.
+Architect Code Coductor must not hand-edit the lock or overwrite human instructions.
 
 The official 0.33.0 CLI advertises `install --dry-run`, `--only apm`, `--target`,
 `--no-trust-bin` and `--root`. Before exposing installation, validate their actual

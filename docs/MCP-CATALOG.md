@@ -2,9 +2,9 @@
 
 ## Principle
 
-MCP is Code Conductor's tool/reference plane. MCP servers expose capabilities; they do not schedule agents or decide authority.
+MCP is Architect Code Coductor's tool/reference plane. MCP servers expose capabilities; they do not schedule agents or decide authority.
 
-Vendor-official MCP servers and explicitly approved Code Conductor first-party adapters may appear in the catalog. Provenance must be explicit. Every MCP is enabled per repository profile and per task need. Do not globally load all tools into all agents.
+Vendor-official MCP servers and explicitly approved Architect Code Coductor first-party adapters may appear in the catalog. Provenance must be explicit. Every MCP is enabled per repository profile and per task need. Do not globally load all tools into all agents.
 
 ## Initial catalog
 
@@ -24,7 +24,7 @@ The context optimizer's MCP transport is **not in the catalog**. Its server exis
 a source checkout, not in the packaged extension, and it stays experimental until W-006
 validates it against the official MCP TypeScript SDK (ADR 0007). Use its direct path,
 `ccon compress <file>`, instead; it reads files on Linux and WSL only (ADR 0007). Catalog
-policy still allows Code Conductor first-party provenance, so a validated adapter can be
+policy still allows Architect Code Coductor first-party provenance, so a validated adapter can be
 listed again.
 
 ## What selection means (I08, #40)
@@ -35,7 +35,7 @@ vendor-official, its provenance, maturity and source, its authentication, its de
 access and whether it is separately billed. Where the catalog records them, it also shows
 the transport and the exact endpoint (or endpoint template) or pinned launch command. It is **selection only**:
 
-- Code Conductor starts no MCP server and grants no authority. Each native client
+- Architect Code Coductor starts no MCP server and grants no authority. Each native client
   (Claude Code, Codex, Copilot, Kiro) activates, authenticates and authorizes its own
   servers.
 - A listed server is not shown to work on this workstation. Each profile is validated
@@ -79,10 +79,10 @@ Profiles are additive only when the repository actually needs the additional pla
 
 ## GitHub Copilot MCP configuration surfaces
 
-Do not conflate GitHub's MCP surfaces with Code Conductor's catalog:
+Do not conflate GitHub's MCP surfaces with Architect Code Coductor's catalog:
 
-- `config/mcp-catalog.yaml` is the Code Conductor policy catalog and runtime selector.
-- `.github/mcp.json` is a minimal committed repository configuration for compatible local Copilot CLI workflows. It is not a mirror of the Code Conductor catalog.
+- `config/mcp-catalog.yaml` is the Architect Code Coductor policy catalog and runtime selector.
+- `.github/mcp.json` is a minimal committed repository configuration for compatible local Copilot CLI workflows. It is not a mirror of the Architect Code Coductor catalog.
 - GitHub.com Copilot code review/cloud-agent MCP servers are configured through the repository's Copilot settings. GitHub's built-in GitHub MCP capability is the preferred GitHub-native path; this repository does not mint a parallel GitHub App token merely to duplicate it.
 
 The repository intentionally does **not** auto-load Azure, Terraform, Cloudflare, or the experimental context optimizer into every Copilot session. Add only the MCP needed for the actual workspace/task.
@@ -107,7 +107,7 @@ tools:
 
 ## Authentication
 
-Authentication belongs to the MCP/vendor identity mechanism, not the agent prompt. Native IAM/RBAC remains authoritative for what the external service permits, while Code Conductor policy may impose stricter limits.
+Authentication belongs to the MCP/vendor identity mechanism, not the agent prompt. Native IAM/RBAC remains authoritative for what the external service permits, while Architect Code Coductor policy may impose stricter limits.
 
 First-party local adapters must still enforce local trust boundaries. For the context optimizer, file reads are restricted to configured workspace roots after canonical/symlink resolution; sensitive credential/state paths, oversized inputs, and non-regular files are denied.
 
@@ -135,17 +135,17 @@ Perplexity is the preferred broad research captain but does not replace official
 
 ## APM relationship
 
-Where Microsoft APM supports declaring/distributing MCP configuration, APM owns package-time declaration/materialization. Code Conductor owns runtime selection and authorization.
+Where Microsoft APM supports declaring/distributing MCP configuration, APM owns package-time declaration/materialization. Architect Code Coductor owns runtime selection and authorization.
 
 ```text
 APM: what MCP dependencies/configuration are available
-Code Conductor: whether this task/agent may use them now
+Architect Code Coductor: whether this task/agent may use them now
 MCP server: executes/exposes the actual tool/resource
 ```
 
 ## Validation checklist before an MCP enters or advances in the approved catalog
 
-- provenance is explicit: vendor-official, Code Conductor first-party, or third-party
+- provenance is explicit: vendor-official, Architect Code Coductor first-party, or third-party
 - publisher/source verified
 - current supported/maturity status verified
 - authentication flow documented

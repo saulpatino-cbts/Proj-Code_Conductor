@@ -24,7 +24,7 @@ export function confirmationCode(requests: readonly ApprovalRequest[]): string {
 }
 
 export function describeApprovalRequests(requests: readonly ApprovalRequest[]): string {
-  const lines = ['', 'Code Conductor pre-action approval required:'];
+  const lines = ['', 'Architect Code Coductor pre-action approval required:'];
   for (const request of requests) {
     lines.push(`  • ${request.action}${request.recipient ? ` → ${shown(request.recipient)}` : ''}`);
     // Summaries lead with counts (for example how many changed files can affect later

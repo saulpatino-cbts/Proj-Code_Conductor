@@ -33,9 +33,9 @@ export function orchestratorStatusText(root: string, inventory: PackInventory, s
   const interview = savedInterviewFor(root, storedInterview);
   const hasSavedInterview = storedInterview !== undefined;
   const lines = [
-    'Code Conductor orchestrator status — local read-only inspection',
+    'Architect Code Coductor orchestrator status — local read-only inspection',
     `Observed at: ${new Date().toISOString()} (timestamped local snapshot).`,
-    'This untitled document does not auto-refresh when local inputs change; rerun "Code Conductor: Inspect Orchestrator Status" to refresh it.',
+    'This untitled document does not auto-refresh when local inputs change; rerun "Architect Code Coductor: Inspect Orchestrator Status" to refresh it.',
     `Repository: ${clean(root, 500)}`,
     '',
     'PACK INVENTORY',

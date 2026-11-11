@@ -1,8 +1,8 @@
-# Code Conductor - Features delivery
+# Architect Code Coductor - Features delivery
 
 Canonical execution ledger: #56. Approved scope: #32 and optional #39, #53, #54, #55.
 Existing Project: https://github.com/users/saulpatinojr/projects/3 . Requested name:
-**Code Conductor - Features**. This document is not proof that the Project changed.
+**Architect Code Coductor - Features**. This document is not proof that the Project changed.
 
 ## Project synchronization
 

@@ -75,7 +75,7 @@ release.
    ```sh
    git fetch origin main
    # The full ref name: a tag named origin/main would otherwise take precedence.
-   git tag -a v0.2.0 -m "Code Conductor 0.2.0" "$(git rev-parse refs/remotes/origin/main)"
+   git tag -a v0.2.0 -m "Architect Code Coductor 0.2.0" "$(git rev-parse refs/remotes/origin/main)"
    git push origin v0.2.0
    ```
 
@@ -101,7 +101,7 @@ and tag again.
 Extension versions are `MAJOR.MINOR.PATCH`. The Marketplace does not support semver
 pre-release suffixes, and VS Code updates users to the highest version available. The
 VS Code publishing guide therefore recommends an even minor number for releases and an
-odd one for pre-releases (for example `0.2.*` and `0.3.*`). Code Conductor follows that
+odd one for pre-releases (for example `0.2.*` and `0.3.*`). Architect Code Coductor follows that
 convention. Pre-release packages (`vsce package --pre-release`) are not built yet
 ([publishing extensions](https://code.visualstudio.com/api/working-with-extensions/publishing-extension),
 "Pre-release extensions").
@@ -186,7 +186,7 @@ Azure DevOps retires global personal access tokens on December 1, 2026.
 
 ## Privacy
 
-Code Conductor sends no telemetry. Everything it records stays on your machine
+Architect Code Coductor sends no telemetry. Everything it records stays on your machine
 ([`INSTALL.md`](INSTALL.md#uninstall)). Its context-savings figures are local estimates,
 not vendor billing or quota data. Provider clients and `gh` talk to their own services
 under their own terms.

@@ -7,7 +7,7 @@ Canonical defaults stay in this source repository's `config/*.yaml`. The determi
 and VS Code distribution, with a SHA-256 manifest. Generated assets are ignored in Git,
 regenerated before typecheck/build and by Vitest global setup for every test entry point
 (including watch mode and IDE runners), and included in the VSIX. Customers do not clone
-Code Conductor or create an application `config` directory. Runtime readers verify the
+Architect Code Coductor or create an application `config` directory. Runtime readers verify the
 packaged manifest. This is artifact consistency/provenance, not a signature or sandbox.
 
 Planner, gate catalog, MCP catalog and VS Code views use packaged defaults, never arbitrary
@@ -47,14 +47,14 @@ Pre-action authorization is separate (#44), as is workstation trust.
 Every runtime document reports its packaged and applicable overlay paths/hashes through
 `loadConfiguration`. `ccon workspace-validate <folder>` prints that provenance without running
 providers, gates, GitHub operations or APM, and works in an unrelated empty folder. The
-existing `ccon validate` deliberately remains the stricter Code Conductor source-repository
+existing `ccon validate` deliberately remains the stricter Architect Code Coductor source-repository
 scaffold/config check used by CI. VS Code Validate uses workspace validation.
 
 ## Portable gates and optional tools
 
 A generic Node project gets the `npm test` gate (`pnpm`/`yarn` when their lockfile is
 present); absence of a working test script or of installed dependencies is a failure, not
-a skipped success ([`GATE-PROFILES.md`](GATE-PROFILES.md)). The source-specific Code Conductor profile requires both
+a skipped success ([`GATE-PROFILES.md`](GATE-PROFILES.md)). The source-specific Architect Code Coductor profile requires both
 the exact `@code-conductor/root` package name and its CLI source marker, so a conventional
 `packages/cli` monorepo receives only the generic Node gate. When no profile applies, gate
 selection returns a blocking `no-applicable-gates` failure with zero commands executed. Terraform and Ansible
@@ -64,7 +64,7 @@ no detected gates must not be represented as proof that a change was tested.
 
 APM is optional in both extension and CLI startup diagnostics. Node, Git and GitHub CLI
 remain baseline workstation prerequisites. Doctor configuration checks no longer require
-the customer's repository to contain Code Conductor development docs or an APM manifest.
+the customer's repository to contain Architect Code Coductor development docs or an APM manifest.
 
 ## Verification
 

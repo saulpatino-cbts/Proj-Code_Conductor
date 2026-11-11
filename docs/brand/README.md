@@ -1,6 +1,6 @@
 # Brand files
 
-The Code Conductor mark is the orchestration graph from `apps/vscode/media/conductor.svg`
+The Architect Code Coductor mark is the orchestration graph from `apps/vscode/media/conductor.svg`
 (three provider nodes feeding two lanes), rendered on a navy rounded square (`#0B1220`,
 nodes `#38BDF8`, lines `#E2E8F0`).
 

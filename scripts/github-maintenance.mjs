@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-const DEFAULTS = Object.freeze({ owner: 'saulpatinojr', repository: 'saulpatinojr/Proj-Code_Conductor', project: 3, title: 'Code Conductor - Features' });
+const DEFAULTS = Object.freeze({ owner: 'saulpatinojr', repository: 'saulpatinojr/Proj-Code_Conductor', project: 3, title: 'Architect Code Coductor - Features' });
 const PROJECT_QUERY = `query($owner:String!,$number:Int!,$cursor:String){user(login:$owner){projectV2(number:$number){id number title url closed items(first:100,after:$cursor){nodes{content{... on Issue{url} ... on PullRequest{url}}}pageInfo{hasNextPage endCursor}}}}}`;
 const LOCAL_GIT_ENV = ['GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_CONFIG', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG_COUNT', 'GIT_OBJECT_DIRECTORY', 'GIT_DIR', 'GIT_WORK_TREE', 'GIT_IMPLICIT_WORK_TREE', 'GIT_GRAFT_FILE', 'GIT_INDEX_FILE', 'GIT_NO_REPLACE_OBJECTS', 'GIT_REPLACE_REF_BASE', 'GIT_PREFIX', 'GIT_SHALLOW_FILE', 'GIT_COMMON_DIR'];
 

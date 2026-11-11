@@ -2,7 +2,7 @@
 
 ## Principle
 
-Code Conductor coordinates official clients; it does not impersonate them, steal session state, or centralize consumer OAuth tokens.
+Architect Code Coductor coordinates official clients; it does not impersonate them, steal session state, or centralize consumer OAuth tokens.
 
 ## Subscription-first policy
 
@@ -37,7 +37,7 @@ their source URLs (`Evidence.uri`) and the billing channel they ran on.
 
 ## Credential storage
 
-Code Conductor MAY store:
+Architect Code Coductor MAY store:
 
 - non-secret provider/harness IDs
 - authentication status (`authenticated`, `not_authenticated`, `unknown`)
@@ -45,7 +45,7 @@ Code Conductor MAY store:
 - billing mode category
 - last health-check timestamp
 
-Code Conductor MUST NOT store:
+Architect Code Coductor MUST NOT store:
 
 - OAuth access tokens
 - refresh tokens
@@ -73,14 +73,14 @@ GCP                  authenticated / unavailable
 
 ## Client states before a provider starts
 
-Implements I02 (#34). Decision: D-065. For Codex, Claude Code and Kiro, Code Conductor
+Implements I02 (#34). Decision: D-065. For Codex, Claude Code and Kiro, Architect Code Coductor
 tells four states apart, and `ccon doctor` reports each one on its own line:
 
 | State | Established by | Without it |
 |---|---|---|
 | Installed | The client is on `PATH` and reports `--version`. | The assignment waits for a manual handoff. |
 | Signed in | The client's own documented status command (below). | The provider is not started. |
-| Healthy | The client reports its version and a sign-in state Code Conductor recognises. | `ccon doctor` warns. A state it does not recognise also blocks starting. |
+| Healthy | The client reports its version and a sign-in state Architect Code Coductor recognises. | `ccon doctor` warns. A state it does not recognise also blocks starting. |
 | Trusted | `ccon harness-smoke <client> --mode read\|modify` passed **for the installed version**. | The provider is not started. |
 
 Official status commands:
@@ -95,7 +95,7 @@ How the checks work:
 
 - **The probes are diagnostics.** They run with no prompt and no repository: in an empty
   private temporary directory, so a repository's own client configuration cannot change
-  the answer. They use the provider environment, so a variable Code Conductor removes
+  the answer. They use the provider environment, so a variable Architect Code Coductor removes
   does not count. They have a 15-second timeout and bounded output.
 - **The run sees what the probe saw.** Claude Code starts with `--setting-sources user`,
   so a repository's `.claude/settings.json`, `.claude/settings.local.json` and
@@ -156,7 +156,7 @@ has no result.
 Limits:
 
 - **Classification follows the vendors' documented values.** A new method shows as
-  unrecognised and blocks until Code Conductor learns it.
+  unrecognised and blocks until Architect Code Coductor learns it.
 - **Codex methods that are not recognised as subscription billing:** access token,
   personal access token and workload identity.
 - **Kiro's JSON output shape is not documented** (`whoami --format json` exists), so
@@ -172,7 +172,7 @@ Limits:
   runs.** Put what a run needs in your user settings, or hand the assignment off and run
   it in the client yourself.
 
-Potential billing-changing environment variables should trigger warnings, for example API-key variables for AI providers when repository policy is `subscription_first` and `allow_separately_billed_api: false`. Code Conductor also removes these credentials, and the variables that select a separately billed provider or endpoint (such as `CLAUDE_CODE_USE_BEDROCK` or `ANTHROPIC_BASE_URL`), from the environment of the provider clients it starts. The full list, and what it cannot cover (credentials a client reads from its own configuration), is in [`WORKTREES.md`](WORKTREES.md#provider-environment).
+Potential billing-changing environment variables should trigger warnings, for example API-key variables for AI providers when repository policy is `subscription_first` and `allow_separately_billed_api: false`. Architect Code Coductor also removes these credentials, and the variables that select a separately billed provider or endpoint (such as `CLAUDE_CODE_USE_BEDROCK` or `ANTHROPIC_BASE_URL`), from the environment of the provider clients it starts. The full list, and what it cannot cover (credentials a client reads from its own configuration), is in [`WORKTREES.md`](WORKTREES.md#provider-environment).
 
 The diagnostic MUST print variable names/status only, never secret values.
 
@@ -193,7 +193,7 @@ If enabled later, the runtime should log which lane incurred API use and enforce
 
 ## Human approval and cloud credentials
 
-Having valid cloud credentials does not grant an agent permission to perform production changes. Code Conductor authority policy is an additional gate above native IAM/RBAC.
+Having valid cloud credentials does not grant an agent permission to perform production changes. Architect Code Coductor authority policy is an additional gate above native IAM/RBAC.
 
 For R4 or otherwise destructive/external production tasks:
 

@@ -1,10 +1,29 @@
-# Claude instructions for Code Conductor
+# Claude instructions for Architect Code Coductor
 
 Welcome! This file tells Claude how to work in this repository. It is written for someone fairly new to the project, so if a word is unfamiliar, it is explained the first time it appears.
 
 ## What this repository is
 
-Code Conductor is a tool that runs inside VS Code (a code editor) and coordinates several AI assistants working on the same software project. It decides who does what, keeps their work separate, checks the results, and makes sure a human gives the final approval.
+Architect Code Coductor is the cloud-architect-first product direction for this
+repository's VS Code-centered multi-agent orchestration system. The goal is to
+help architects carry requirements through evidence-backed options, reviewable
+architecture/IaC artifacts, independent challenge, deterministic checks, and
+human-controlled handoff.
+
+This direction is not a statement that all cloud workflow stages are already
+implemented. Read [`docs/ARCHITECT-WORKFLOW.md`](docs/ARCHITECT-WORKFLOW.md)
+for the authoritative workflow and shipped-versus-direction boundaries, and
+ADR 0020 / D-081 for the locked priority. Prefer provider-neutral outcomes
+across Azure, AWS and Google Cloud; make security, resilience, cost, operations,
+performance and sustainability trade-offs explicit. Keep official-source
+provenance, independent challenge, deterministic evidence and human authority.
+
+The existing GitHub repository, package and extension identities retain the
+compatibility name `Code Conductor`; do not rename `ccon`, public contracts,
+IDs, or state paths. Older ADRs and release evidence retain historical wording.
+Canonical agent memory is in tracked repository instructions/documents; there is
+no global memory service to update. Do not edit APM-generated projections for
+this presentation change.
 
 It is written in TypeScript (JavaScript with type checking) and runs on Node.js 22 or newer.
 

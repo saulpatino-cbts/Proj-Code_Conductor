@@ -29,7 +29,7 @@ Describe the problem, the change, and why this approach was chosen.
 
 ## Evidence / findings
 
-Link tests, logs, issues, ADRs, official documentation, or Code Conductor run/evidence records that support the change.
+Link tests, logs, issues, ADRs, official documentation, or Architect Code Coductor run/evidence records that support the change.
 
 ## Follow-up
 

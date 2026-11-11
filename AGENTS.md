@@ -1,13 +1,33 @@
-# Code Conductor Constitution
+# Architect Code Coductor Constitution
 
 This file defines repository-wide operating law for human and AI contributors.
+
+## Architect-first product direction
+
+The product direction is **Architect Code Coductor**: prioritize cloud
+architects' end-to-end workflow, provider-neutral across Azure, AWS and Google
+Cloud. Apply the authoritative workflow and current-versus-future capability
+boundaries in [`docs/ARCHITECT-WORKFLOW.md`](docs/ARCHITECT-WORKFLOW.md) and
+the locked decision ADR 0020 / D-081. Architect decisions must account for
+evidence-backed trade-offs in security, resilience, cost, operations,
+performance and sustainability; preserve deterministic validation, independent
+challenge appropriate to risk, and action-specific human approval. Do not claim
+cloud capabilities that source and validation evidence do not establish.
+
+Use the requested product name in maintained first-party prose and display
+labels. This is not a compatibility migration: preserve exact repository,
+package, publisher, command, API, extension, configuration and state identifiers;
+official/sibling names; generated APM projections; and immutable historical
+evidence. The detailed exceptions and durable-memory boundaries are in the
+workflow document. Tracked instructions are repository memory; do not claim an
+external/global memory update.
 
 ## 1. Source-of-truth hierarchy
 
 1. User-approved requirements and repository policy.
 2. Executable repository evidence: tests, plans, diffs, CI, build results.
 3. Official vendor documentation and official MCP-provided references.
-4. Code Conductor run manifests and structured findings.
+4. Architect Code Coductor run manifests and structured findings.
 5. Agent recommendations and confidence statements.
 
 A higher-capability model does not automatically overrule stronger evidence.
@@ -88,9 +108,9 @@ Perplexity may discover sources, but authoritative implementation decisions shou
 ## 9. Authentication and billing
 
 - Prefer existing subscription-backed official clients before separately billed model APIs.
-- Do not copy consumer OAuth/session credentials into Code Conductor.
+- Do not copy consumer OAuth/session credentials into Architect Code Coductor.
 - Do not commit tokens, API keys, cookies, refresh tokens, credentials, state files, or secrets.
-- Code Conductor may detect authentication/billing state but does not become the credential authority.
+- Architect Code Coductor may detect authentication/billing state but does not become the credential authority.
 - Separately billed API execution must be explicit and policy-controlled.
 
 ## 10. Packaging
@@ -99,13 +119,13 @@ Perplexity may discover sources, but authoritative implementation decisions shou
 - `apm.yml` declares project package dependencies.
 - `apm.lock.yaml` pins resolved dependency state.
 - `apm-policy.yml` governs allowed package/MCP policy.
-- Canonical agent-pack source lives in the Agent Packs repository (`saulpatinojr/Proj-Agent_Packs`) and is installed through APM from its company-owned mirror `hybridcloudworks/Proj-AgentPacks` at a pinned reference; Code Conductor ships no agent files, and `.apm/` here holds only Code Conductor's own skills (ADR 0015).
+- Canonical agent-pack source lives in the Agent Packs repository (`saulpatinojr/Proj-Agent_Packs`) and is installed through APM from its company-owned mirror `hybridcloudworks/Proj-AgentPacks` at a pinned reference; Architect Code Coductor ships no agent files, and `.apm/` here holds only Architect Code Coductor's own skills (ADR 0015).
 - Roles (`config/roles.yaml`) are runtime vocabulary: their authority and one-line rules are rendered into every assignment prompt by the runtime, not read from agent files.
 - Do not manually fork equivalent agent instructions across Copilot, Claude, Codex, Kiro and Google when APM can project them.
 
 ## 11. Runtime orchestration
 
-APM is not the runtime scheduler. Code Conductor owns:
+APM is not the runtime scheduler. Architect Code Coductor owns:
 
 - task decomposition and DAG
 - capability-aware routing

@@ -1,6 +1,10 @@
-# STARTER.md — Code Conductor continuity handoff
+# STARTER.md — Architect Code Coductor continuity handoff
 
-This repository is the canonical home for Code Conductor. Use this file as the short entry point when a new human or AI work session resumes the project.
+This repository is the canonical source for **Architect Code Coductor**, the
+architect-first product direction implemented on the compatibility-named Code
+Conductor foundation.
+Use this file as the short entry point when a new human or AI work session
+resumes the project.
 
 ## Read first
 
@@ -13,10 +17,24 @@ Read in this order before making material changes:
 5. Relevant domain docs under `docs/` and the applicable ADRs, including ADR 0007 for context preparation, ADR 0008 for the thin-client/startup model, and ADR 0009 for surface-aware harness/provider specialization.
 6. GitHub roadmap issue #7 and the active release/readiness issue #4.
 7. `CONTRIBUTING.md` before changing branches, APM source, workflows, or governance files.
+8. `docs/ARCHITECT-WORKFLOW.md` and ADR 0020 / D-081 before making product,
+   architecture or roadmap choices. This workflow document is authoritative
+   for architect priorities, evidence, current capability limits and naming
+   exceptions.
 
 Do not redesign a locked architecture decision from memory or preference. If verified platform evidence requires a change, create a superseding ADR and update the decision register in the same PR.
 
 ## Current checkpoint
+
+The locked product priority is cloud-architect-first across Azure, AWS and
+Google Cloud. Treat requirements, official research, options, evidence-backed
+security/resilience/cost/operations/performance/sustainability trade-offs,
+reviewable architecture/IaC proposals, independent challenge, deterministic
+validation and human-approved handoff as the target workflow—not as a claim
+that every stage is already implemented. See
+[`docs/ARCHITECT-WORKFLOW.md`](docs/ARCHITECT-WORKFLOW.md) for capability status
+and [`docs/ARCHITECT-ISSUE-PRIORITIES.md`](docs/ARCHITECT-ISSUE-PRIORITIES.md)
+for the open-issue completion assessment.
 
 The repository foundation is implemented rather than architecture-only:
 
@@ -30,7 +48,7 @@ The repository foundation is implemented rather than architecture-only:
 - the first-party context optimizer exists as a bounded context-preparation component with lossless default behavior, explicit aggressive mode, workspace/sensitive-path protection, and estimated-token telemetry;
 - the context optimizer's MCP transport is intentionally experimental pending official MCP TypeScript SDK/current-protocol validation;
 - `ccon validate`, `doctor`, `plan`, `run`, `harness-smoke`, MCP/APM, GitHub-gate, `context-stats`, `compress` and `gate-output` command paths exist; gate output is stored with each run and may be shown as an opt-in verbatim-line summary (`run --tool-output summary`, D-071);
-- the VS Code extension exposes Team, Runs, Gates, Connections, Packs, and Usage and now bundles the compiled Code Conductor runtime for packaged use;
+- the VS Code extension exposes Team, Runs, Gates, Connections, Packs, and Usage and now bundles the compiled Architect Code Coductor runtime for packaged use;
 - CodeQL, dependency-review configuration, repository CI, APM audit, npm lockfile validation, and secret scanning are part of the GitHub governance baseline;
 - repository-scoped Copilot CLI MCP configuration is minimal under `.github/mcp.json`; GitHub.com Copilot MCP configuration remains a repository-settings/platform concern rather than a custom token-minting workflow;
 - multiple GitHub Copilot Gatekeeper review rounds have been exercised and concrete findings have been addressed with targeted regression coverage;
@@ -65,7 +83,7 @@ The architecture/runtime delta from #10/#11/#12 is implemented. Do not reopen it
 3. Validate official subscription authentication and surface-specific read/modify trust for Codex, Claude Code, and Kiro ACP. Kiro remains fail-closed until installed-version/policy/authority validation passes.
 4. Keep Antigravity unattended execution blocked until ADR 0004 is superseded with current evidence; continue treating it as the Google/GCP specialist lane.
 5. Validate only the MCP/reference and deterministic-tool profiles required by the dogfood scenario.
-6. Execute the first real R1 Code Conductor task in an isolated modifying worktree, then raise it to R2 with a different-provider challenger and GitHub Gatekeeper participation.
+6. Execute the first real R1 Architect Code Coductor task in an isolated modifying worktree, then raise it to R2 with a different-provider challenger and GitHub Gatekeeper participation.
 7. Capture structured evidence, fix defects found, and validate the VS Code cockpit/startup behavior against the real run.
 8. In parallel, use the merged Agent Catalog intake tool against the actual legacy corpus and review migration batches into modular APM packages with 100% source-lineage accounting.
 9. Continue the merged VSIX packaging foundation into #14 Marketplace/provenance/SBOM/attestation/publication work.
@@ -73,15 +91,15 @@ The architecture/runtime delta from #10/#11/#12 is implemented. Do not reopen it
 
 ## Locked operating model
 
-- VS Code is the primary cockpit; Code Conductor v0.x does not require a standalone desktop application.
+- VS Code is the primary cockpit; Architect Code Coductor v0.x does not require a standalone desktop application.
 - The thin VS Code extension and optional thin `ccon` CLI/TUI use the same versioned core/runtime.
 - First run performs explicit bootstrap/discovery; warm starts use cached non-secret state and lazy provider/MCP/APM activation.
-- Code Conductor owns runtime orchestration, risk, authority, context-preparation policy, evidence, and readiness.
+- Architect Code Coductor owns runtime orchestration, risk, authority, context-preparation policy, evidence, and readiness.
 - APM owns reusable agent-pack dependency/distribution/integrity concerns.
 - MCP provides tools/resources and is not the team scheduler.
 - Harness integration is surface-aware rather than reduced to a generic CLI boolean.
 - Provider-native subagents, skills, hooks, commands/plugins/Powers, permissions, sessions, and IDE capabilities are preserved where officially supported.
-- Cross-provider AI invocation is mediated by Code Conductor; provider-local subagents may operate inside an assigned task boundary.
+- Cross-provider AI invocation is mediated by Architect Code Coductor; provider-local subagents may operate inside an assigned task boundary.
 - Kiro is the preferred specification/design/task-planning lead and AWS specialist; `kiro-cli acp` is the preferred Kiro client/harness boundary where policy and workstation validation permit it.
 - Claude Code is preferred for large-codebase engineering/refactoring/deep codebase reasoning.
 - Codex is preferred for implementation/debugging/testing/repository execution.
@@ -114,7 +132,7 @@ For live clients, use the smoke-test sequence in `docs/WORKSTATION-VALIDATION.md
 - Do not work directly on `main` for normal feature changes.
 - Remove merged/superseded remote and local branches after confirming their commits are preserved on `main`.
 - Do not commit runtime state, credentials, local worktrees, build output, package caches, or local context-optimizer telemetry.
-- Specialist agents and skills come from the Agent Packs repository through APM; `.apm/` holds only Code Conductor's own skills (ADR 0015), and generated target projections are committed only when they match the APM lock/materialization state.
+- Specialist agents and skills come from the Agent Packs repository through APM; `.apm/` holds only Architect Code Coductor's own skills (ADR 0015), and generated target projections are committed only when they match the APM lock/materialization state.
 - Keep GitHub-specific review skills under `.github/skills/` scoped to GitHub behavior; do not duplicate cross-harness canonical pack content there.
 - Keep `README.md`, `STARTER.md`, `docs/STATUS.md`, `CHANGELOG.md`, and relevant ADR/runbooks synchronized with material behavior changes.
 

@@ -1,28 +1,28 @@
 # Install, update and uninstall
 
-Implements I01 from #33/#32. Code Conductor ships as one VS Code extension (a `.vsix`).
+Implements I01 from #33/#32. Architect Code Coductor ships as one VS Code extension (a `.vsix`).
 The extension carries:
 
 - the `ccon` runtime, bundled into a single file;
 - the packaged defaults ([`PACKAGED-DEFAULTS.md`](PACKAGED-DEFAULTS.md));
 - the contract schema.
 
-It works in any repository without cloning or building Code Conductor. There is no hosted
+It works in any repository without cloning or building Architect Code Coductor. There is no hosted
 backend: everything runs, and is stored, on the machine where your workspace lives.
 
 ## Get the beta
 
-The current build is [0.1.2 (beta)](https://github.com/saulpatinojr/Proj-Code_Conductor/releases/tag/v0.1.2), a GitHub pre-release. Download `code-conductor-0.1.2.vsix` and `SHA256SUMS` from it, then:
+The current GitHub release is [0.1.3](https://github.com/saulpatinojr/Proj-Code_Conductor/releases/tag/v0.1.3). Download `code-conductor-0.1.3.vsix` and `SHA256SUMS` from it, then:
 
 ```bash
 sha256sum -c SHA256SUMS
-gh attestation verify code-conductor-0.1.2.vsix --repo saulpatinojr/Proj-Code_Conductor
-code --install-extension code-conductor-0.1.2.vsix
+gh attestation verify code-conductor-0.1.3.vsix --repo saulpatinojr/Proj-Code_Conductor
+code --install-extension code-conductor-0.1.3.vsix
 ```
 
-`sha256sum` does not exist in Windows PowerShell. There, run `Get-FileHash .\code-conductor-0.1.2.vsix -Algorithm SHA256` and `Get-Content .\SHA256SUMS`, and check that the hash printed by the first command matches the `.vsix` line in the second. The release notes carry the full, exact `gh attestation verify` command, and [`RELEASE.md`](RELEASE.md) explains it.
+`sha256sum` does not exist in Windows PowerShell. There, run `Get-FileHash .\code-conductor-0.1.3.vsix -Algorithm SHA256` and `Get-Content .\SHA256SUMS`, and check that the hash printed by the first command matches the `.vsix` line in the second. The release notes carry the full, exact `gh attestation verify` command, and [`RELEASE.md`](RELEASE.md) explains it.
 
-The extension does not put `ccon` on `PATH`; run the bundled runtime by path, for example in PowerShell `function ccon { node "$env:USERPROFILE\.vscode\extensions\hybridcloudworks.code-conductor-vscode-0.1.2\dist\ccon.js" @args }`. There is no Marketplace listing yet.
+The extension does not put `ccon` on `PATH`; run the bundled runtime by path, for example in PowerShell `function ccon { node "$env:USERPROFILE\.vscode\extensions\hybridcloudworks.code-conductor-vscode-0.1.3\dist\ccon.js" @args }`. The Marketplace publish job for the v0.1.3 workflow was denied by publisher permission; GitHub release availability does not establish a Marketplace listing. See [`STATUS.md`](STATUS.md) for the recorded evidence.
 
 ## Prerequisites
 
@@ -58,10 +58,13 @@ code --install-extension code-conductor-<version>.vsix
 ```
 
 You can also use the Extensions view: open its `…` menu and choose **Install from
-VSIX…**. Then open any repository, trust it, and run **Code Conductor: Doctor**. Doctor
-shows each client's installed, signed-in, healthy and trusted state, and what to do next.
+VSIX…**. Then open any repository and trust it. On the released v0.1.3 extension,
+run **Code Conductor: Doctor**; its shipped command title predates the new
+Architect Code Coductor development display name. Builds from the current source
+use **Architect Code Coductor: Doctor**. The command displays each client's
+installed, signed-in, healthy and trusted state, and what to do next.
 
-The extension is not on the Marketplace yet. Releases are attached to GitHub releases,
+The extension is not verified as available on the Marketplace. Releases are attached to GitHub releases,
 with checksums, an SBOM and a provenance attestation to verify first
 ([`RELEASE.md`](RELEASE.md#verify-a-package)). CI also packages it under a
 validation-only publisher on every pull request.
@@ -98,7 +101,7 @@ code --uninstall-extension <publisher>.code-conductor-vscode
 
 You can also uninstall from the Extensions view.
 
-Uninstalling removes the extension only. Code Conductor never uploads anything, and it
+Uninstalling removes the extension only. Architect Code Coductor never uploads anything, and it
 leaves your data where it is:
 
 - `~/.code-conductor/`, or `$CODE_CONDUCTOR_HOME` if you set it:
@@ -125,7 +128,7 @@ To remove everything, do this **before** uninstalling:
 2. Delete the `cc/…` branches you no longer need with `git branch -D`.
 3. Delete `~/.code-conductor/`, and `$CODE_CONDUCTOR_HOME` if you set it.
 
-Code Conductor stores no credentials. Sign-in state stays in each official client and is
+Architect Code Coductor stores no credentials. Sign-in state stays in each official client and is
 removed through that client (for example `claude auth logout`, `codex logout` or
 `kiro-cli logout`).
 

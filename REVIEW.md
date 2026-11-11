@@ -1,4 +1,4 @@
-# Code Conductor review standard
+# Architect Code Coductor review standard
 
 This file defines the shared review checklist for human reviewers and GitHub Copilot code review. It complements `AGENTS.md`; it does not replace deterministic tests or policy gates.
 

@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-ADRs record decisions that materially change Code Conductor's architecture, security boundaries, authentication/billing behavior, provider/harness contracts, or a `LOCKED` entry in `docs/DECISIONS.md`.
+ADRs record decisions that materially change Architect Code Coductor's architecture, security boundaries, authentication/billing behavior, provider/harness contracts, or a `LOCKED` entry in `docs/DECISIONS.md`.
 
 ## Naming
 
@@ -33,3 +33,4 @@ Do not use an ADR to justify bypassing a failing deterministic gate. Fix the pro
 - [ADR 0017 — Write-isolated selected-pack projection previews](0017-write-isolated-pack-projection-preview.md)
 - [ADR 0018 — Approve and deploy exact native APM artifacts](0018-approved-apm-artifact-deployment.md)
 - [ADR 0019 — Pack controls, short interview and a live orchestrator blueprint](0019-pack-controls-and-orchestrator-blueprint.md).
+- [ADR 0020 — Architect-first cloud architecture workflow](0020-architect-first-cloud-architecture-workflow.md).

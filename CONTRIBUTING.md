@@ -1,6 +1,15 @@
-# Contributing to Code Conductor
+# Contributing to Architect Code Coductor
 
-Code Conductor is developed through small, reviewable Git changes with deterministic validation and explicit separation of duties between implementation and approval.
+Architect Code Coductor is developed through small, reviewable Git changes with deterministic validation and explicit separation of duties between implementation and approval.
+
+Product changes must prioritize cloud architects according to
+[`docs/ARCHITECT-WORKFLOW.md`](docs/ARCHITECT-WORKFLOW.md) and ADR 0020 / D-081.
+Keep Azure, AWS and Google Cloud as requirements-driven alternatives; record
+evidence and trade-offs across security, resilience, cost, operations,
+performance and sustainability. Clearly distinguish shipped behavior from
+future direction and retain existing human approval, deterministic validation
+and provider-native boundaries. Do not treat this positioning update as a
+runtime-authority or compatibility-identifier change.
 
 ## Before changing code
 
@@ -64,7 +73,7 @@ Every PR must:
 - state the risk class when runtime behavior changes;
 - identify validation performed;
 - update documentation when behavior, policy, or setup changes;
-- keep generated APM projections consistent with `.apm/` source (Code Conductor's own skills; specialist agents live in Agent Packs, ADR 0015);
+- keep generated APM projections consistent with `.apm/` source (Architect Code Coductor's own skills; specialist agents live in Agent Packs, ADR 0015);
 - avoid secrets, tokens, state files, or credential material;
 - satisfy required GitHub Actions checks before merge.
 

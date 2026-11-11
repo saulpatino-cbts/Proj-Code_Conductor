@@ -105,7 +105,7 @@ function harnessLabel(id: string): string {
     kiro: 'Kiro',
     antigravity: 'Google Antigravity',
     perplexity: 'Perplexity',
-    'internal-validator': 'Code Conductor Validator',
+    'internal-validator': 'Architect Code Coductor Validator',
   };
   return labels[id] ?? id;
 }
@@ -428,14 +428,14 @@ async function performNextAction(context: vscode.ExtensionContext, action: NextA
       return;
     case 'run_cli': {
       const r = workspaceRoot();
-      if (r) await runCli(context, r, operation.args, `Code Conductor ${operation.args[0] ?? ''}`.trim());
+      if (r) await runCli(context, r, operation.args, `Architect Code Coductor ${operation.args[0] ?? ''}`.trim());
       return;
     }
     case 'copy_command': {
       // Shown in a modal (non-modal messages do not show their detail) before anything is
       // copied, so the person sees the exact command they will paste.
       const shell = process.platform === 'win32' ? 'PowerShell' : 'a POSIX shell';
-      const choice = await vscode.window.showInformationMessage(`${printable(action.title, 200)}: copy this command for ${shell}? Run it yourself; Code Conductor does not run it for you.`, { detail: operation.text.split('\n').map((line) => printable(line, 2000, false)).join('\n'), modal: true }, 'Copy');
+      const choice = await vscode.window.showInformationMessage(`${printable(action.title, 200)}: copy this command for ${shell}? Run it yourself; Architect Code Coductor does not run it for you.`, { detail: operation.text.split('\n').map((line) => printable(line, 2000, false)).join('\n'), modal: true }, 'Copy');
       if (choice === 'Copy') await vscode.env.clipboard.writeText(operation.text);
       return;
     }
@@ -503,7 +503,7 @@ async function showSignIn(root: string | undefined, harnessId: unknown): Promise
   const hint = signInHint(capabilities?.harnesses?.[harnessId]?.sign_in);
   if (!hint) { await vscode.window.showInformationMessage(`${harnessLabel(harnessId)}: sign in through its official client.`); return; }
   const choices = [...(hint.command ? ['Copy sign-in command'] : []), ...(hint.docs ? ['Open official documentation'] : []), 'Run Doctor'];
-  const choice = await vscode.window.showInformationMessage(`${harnessLabel(harnessId)}: ${hint.instructions} Code Conductor never asks for, stores or copies your credentials.`, ...choices);
+  const choice = await vscode.window.showInformationMessage(`${harnessLabel(harnessId)}: ${hint.instructions} Architect Code Coductor never asks for, stores or copies your credentials.`, ...choices);
   if (choice === 'Copy sign-in command' && hint.command) await vscode.env.clipboard.writeText(hint.command);
   if (choice === 'Open official documentation' && hint.docs) await vscode.env.openExternal(vscode.Uri.parse(hint.docs));
   if (choice === 'Run Doctor') await vscode.commands.executeCommand('codeConductor.doctor');
@@ -541,7 +541,7 @@ async function openWorkspaceFile(path: unknown, relative: unknown): Promise<void
 async function runCli(context: vscode.ExtensionContext, root: string, args: string[], title: string): Promise<void> {
   const runtime = join(context.extensionPath, 'dist', 'ccon.js');
   if (!existsSync(runtime)) {
-    await vscode.window.showErrorMessage('Code Conductor runtime bundle is missing. Reinstall the extension; customer repositories should never build the runtime themselves.');
+    await vscode.window.showErrorMessage('Architect Code Coductor runtime bundle is missing. Reinstall the extension; customer repositories should never build the runtime themselves.');
     return;
   }
   try {
@@ -549,13 +549,13 @@ async function runCli(context: vscode.ExtensionContext, root: string, args: stri
     const execution = new vscode.ProcessExecution(spec.executable, spec.args, { cwd: spec.cwd });
     const folder = vscode.workspace.workspaceFolders?.find((item) => item.uri.fsPath === root);
     const launchId = randomUUID();
-    const task = new vscode.Task({ type: 'code-conductor', operation: args[0] ?? 'unknown', launchId }, folder ?? vscode.TaskScope.Workspace, title, 'Code Conductor', execution);
+    const task = new vscode.Task({ type: 'code-conductor', operation: args[0] ?? 'unknown', launchId }, folder ?? vscode.TaskScope.Workspace, title, 'Architect Code Coductor', execution);
     task.presentationOptions = { reveal: vscode.TaskRevealKind.Always, panel: vscode.TaskPanelKind.Dedicated, echo: false };
     launchedTasks.set(launchId, root);
     try { await vscode.tasks.executeTask(task); }
     catch (error) { launchedTasks.delete(launchId); throw error; }
   } catch (error) {
-    await vscode.window.showErrorMessage(error instanceof Error ? error.message : 'Code Conductor command failed to start.');
+    await vscode.window.showErrorMessage(error instanceof Error ? error.message : 'Architect Code Coductor command failed to start.');
   }
 }
 
@@ -565,7 +565,7 @@ async function initializeStartup(context: vscode.ExtensionContext): Promise<vsco
   const root = workspaceRoot();
   if (!root) {
     status.text = '$(radio-tower) Conductor: No Workspace';
-    status.tooltip = 'Open a repository workspace to initialize Code Conductor.';
+    status.tooltip = 'Open a repository workspace to initialize Architect Code Coductor.';
     status.show();
     return status;
   }
@@ -704,8 +704,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   taskLifecycle = new TaskLifecycle((taskRoot, outcome) => {
     taskOutcomes.set(taskRoot, outcome);
     void refreshViews();
-    if (outcome === 'failed') void vscode.window.showWarningMessage('Code Conductor task failed. See its terminal output for diagnostics.');
-    if (outcome === 'cancelled') void vscode.window.showInformationMessage('Code Conductor task ended without an exit status; completion is unverified.');
+    if (outcome === 'failed') void vscode.window.showWarningMessage('Architect Code Coductor task failed. See its terminal output for diagnostics.');
+    if (outcome === 'cancelled') void vscode.window.showInformationMessage('Architect Code Coductor task ended without an exit status; completion is unverified.');
   });
   context.subscriptions.push(
     vscode.tasks.onDidStartTask((event) => {
@@ -732,7 +732,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   }));
   context.subscriptions.push(vscode.commands.registerCommand('codeConductor.selectWorkspace', async () => {
     const folders = vscode.workspace.workspaceFolders ?? [];
-    const picked = await vscode.window.showQuickPick(folders.map((folder) => ({ label: folder.name, description: folder.uri.fsPath })), { placeHolder: 'Select the repository for Code Conductor' });
+    const picked = await vscode.window.showQuickPick(folders.map((folder) => ({ label: folder.name, description: folder.uri.fsPath })), { placeHolder: 'Select the repository for Architect Code Coductor' });
     if (!picked) return;
     knowledgeCache.clear();
     selectedWorkspace = picked.description;
@@ -832,13 +832,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       { label: 'GitHub expert engineer', pack: 'github-expert-engineer-pack', description: 'Reviewed mirror · 16f41836d65c · Codex projections' },
     ], { canPickMany: true, title: 'Preview public pack downloads; repository files stay unchanged', ignoreFocusOut: true });
     if (!selected?.length || !sameRepository(root(), r) || !vscode.workspace.isTrusted || vscode.env.remoteName) return;
-    await runCli(context, r, ['apm-preview', '--repo', r, '--packs', selected.map((item) => item.pack).join(',')], 'Code Conductor Pack Projection Preview');
+    await runCli(context, r, ['apm-preview', '--repo', r, '--packs', selected.map((item) => item.pack).join(',')], 'Architect Code Coductor Pack Projection Preview');
   }));
   context.subscriptions.push(vscode.commands.registerCommand('codeConductor.auditPacks', async () => {
-    const r = root(); if (r) await runCli(context, r, ['apm-audit', '.'], 'Code Conductor APM Audit');
+    const r = root(); if (r) await runCli(context, r, ['apm-audit', '.'], 'Architect Code Coductor APM Audit');
   }));
-  context.subscriptions.push(vscode.commands.registerCommand('codeConductor.doctor', async () => { const r = root(); if (r) await runCli(context, r, ['doctor', '.'], 'Code Conductor Doctor'); }));
-  context.subscriptions.push(vscode.commands.registerCommand('codeConductor.validate', async () => { const r = root(); if (r) await runCli(context, r, ['workspace-validate', '.'], 'Code Conductor Validate'); }));
+  context.subscriptions.push(vscode.commands.registerCommand('codeConductor.doctor', async () => { const r = root(); if (r) await runCli(context, r, ['doctor', '.'], 'Architect Code Coductor Doctor'); }));
+  context.subscriptions.push(vscode.commands.registerCommand('codeConductor.validate', async () => { const r = root(); if (r) await runCli(context, r, ['workspace-validate', '.'], 'Architect Code Coductor Validate'); }));
   context.subscriptions.push(vscode.commands.registerCommand('codeConductor.plan', async () => {
     const r = root(); if (!r) return; const objective = await vscode.window.showInputBox({ prompt: 'What should the run do? One sentence; name the files.', placeHolder: 'Add a test for subtract() in math.test.js; do not change math.js', ignoreFocusOut: true }); if (!objective) return;
     const risk = await vscode.window.showQuickPick([
@@ -849,7 +849,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       { label: 'R4', description: 'destructive or production: R3 plus approval before any side effect' },
     ], { placeHolder: 'Risk class' }); if (!risk) return;
     if (r !== root()) { await vscode.window.showWarningMessage('Repository selection changed. Start planning again for the selected repository.'); return; }
-    await runCli(context, r, ['plan', '--repo', '.', '--risk', risk.label, '--objective', objective], 'Code Conductor Plan');
+    await runCli(context, r, ['plan', '--repo', '.', '--risk', risk.label, '--objective', objective], 'Architect Code Coductor Plan');
     await refreshViews();
   }));
   context.subscriptions.push(vscode.commands.registerCommand('codeConductor.nextActions', async (runId: unknown) => showNextActions(context, runId)));
@@ -869,7 +869,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   context.subscriptions.push(vscode.commands.registerCommand('codeConductor.openDecisions', async () => {
     const r = root(); if (!r) return; const uri = vscode.Uri.file(join(r, 'docs', 'DECISIONS.md'));
     if (existsSync(uri.fsPath)) await vscode.window.showTextDocument(uri);
-    else await vscode.window.showInformationMessage('This repository has no docs/DECISIONS.md. Code Conductor\'s own decision register is at github.com/saulpatinojr/Proj-Code_Conductor/blob/main/docs/DECISIONS.md.');
+    else await vscode.window.showInformationMessage('This repository has no docs/DECISIONS.md. Architect Code Coductor\'s own decision register is at github.com/saulpatinojr/Proj-Code_Conductor/blob/main/docs/DECISIONS.md.');
   }));
 }
 

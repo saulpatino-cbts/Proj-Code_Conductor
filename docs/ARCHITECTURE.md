@@ -1,22 +1,27 @@
-# Code Conductor Architecture Baseline
+# Architect Code Coductor Architecture Baseline
 
 ## Purpose
 
-Code Conductor is a VS Code-centered, multi-provider software-engineering team runtime. It coordinates specialized agents, official vendor harnesses, APM-managed Agent Packs, official MCP tools/reference sources, safe context preparation, Git worktrees, deterministic validation, and GitHub PR governance.
+The existing runtime is a VS Code-centered, multi-provider software-engineering
+system. The architect-first product priority and cloud-specific workflow status
+are defined in [`ARCHITECT-WORKFLOW.md`](ARCHITECT-WORKFLOW.md) and ADR 0020 /
+D-081. This architecture document describes the reusable orchestration
+foundation; it does not claim that cloud-specific research, diagrams, IaC
+proposals, or complete Well-Architected assessment are already implemented.
 
 ## System boundaries
 
 ### Human cockpit
 
-VS Code remains the operator surface. Code Conductor adds lightweight orchestration/status/task-intake views and deep-links into native chat/session, terminal, diff, Source Control, and PR experiences.
+VS Code remains the operator surface. Architect Code Coductor adds lightweight orchestration/status/task-intake views and deep-links into native chat/session, terminal, diff, Source Control, and PR experiences.
 
-Code Conductor v0.x does **not** require a standalone MAUI/Electron/tray application. The supported product surfaces are:
+Architect Code Coductor v0.x does **not** require a standalone MAUI/Electron/tray application. The supported product surfaces are:
 
-- thin Code Conductor VS Code extension;
+- thin Architect Code Coductor VS Code extension;
 - optional thin `ccon` CLI/TUI;
 - the same versioned core/runtime behind both.
 
-The production extension must not require a customer repository to contain Code Conductor source or run `npm run build`.
+The production extension must not require a customer repository to contain Architect Code Coductor source or run `npm run build`.
 
 ### Startup lifecycle
 
@@ -32,7 +37,7 @@ Subsequent VS Code launches use cached non-secret health/trust state plus lightw
 
 ### Runtime orchestration plane
 
-Code Conductor Core owns:
+Architect Code Coductor Core owns:
 
 - task intake and normalization
 - risk classification
@@ -77,16 +82,16 @@ Provider-native capability must be preserved rather than flattened to a lowest-c
 
 There are two distinct agent levels:
 
-1. **Code Conductor team agents** — cross-provider roles selected by Conductor. Conductor owns provider selection, risk, authority, billing channel, worktree ownership, evidence, and readiness.
+1. **Architect Code Coductor team agents** — cross-provider roles selected by Conductor. Conductor owns provider selection, risk, authority, billing channel, worktree ownership, evidence, and readiness.
 2. **Provider-local agents/subagents** — native helpers spawned within an already-assigned provider task. These may use the provider's own subagent/crew/team model when policy permits.
 
-Provider-local subagents do not become independent cross-provider schedulers. One AI provider may not silently shell out to another AI provider and bypass Code Conductor's assignment/evidence boundary.
+Provider-local subagents do not become independent cross-provider schedulers. One AI provider may not silently shell out to another AI provider and bypass Architect Code Coductor's assignment/evidence boundary.
 
 ### Kiro integration
 
 Kiro is a preferred first-class integration, not a generic interchangeable CLI worker.
 
-For the VS Code-centered product, the preferred Kiro boundary is `kiro-cli acp` where current Kiro policy and installed-version validation permit it. Code Conductor acts as an ACP client and preserves Kiro-native session/tool/MCP/agent/subagent/steering/spec/permission capabilities exposed through the harness.
+For the VS Code-centered product, the preferred Kiro boundary is `kiro-cli acp` where current Kiro policy and installed-version validation permit it. Architect Code Coductor acts as an ACP client and preserves Kiro-native session/tool/MCP/agent/subagent/steering/spec/permission capabilities exposed through the harness.
 
 Kiro is the primary routing preference for:
 
@@ -113,7 +118,7 @@ Microsoft APM is responsible for reusable agent context packaging and dependency
 - target materialization
 - drift/integrity audit
 
-Code Conductor consumes APM; it does not replace APM.
+Architect Code Coductor consumes APM; it does not replace APM.
 
 The large legacy agent/skill corpus is migrated through a lineage-controlled process. Every original file must be preserved/inventoried and receive either a canonical destination or an explicit duplicate/superseded disposition before retirement. Canonical packages should be modular by domain/capability, with provider overlays only for genuine harness-specific behavior.
 
@@ -146,7 +151,7 @@ Initial official catalog focus:
 - Google Cloud
 - Perplexity only when automated API-backed research is explicitly enabled
 
-Code Conductor may also expose approved **first-party** MCP adapters. They are explicitly distinguished from vendor-official servers and remain profile-driven/minimal.
+Architect Code Coductor may also expose approved **first-party** MCP adapters. They are explicitly distinguished from vendor-official servers and remain profile-driven/minimal.
 
 Deterministic engineering tools are not peer GenAI agents. Examples include:
 
@@ -191,7 +196,7 @@ The same underlying model may serve multiple roles. A primary specialization is 
 
 | Provider / harness | Primary specialization | Secondary eligible work |
 |---|---|---|
-| Code Conductor | orchestration, risk, routing, authority, evidence, gates, arbitration | none; coordinates rather than competes |
+| Architect Code Coductor | orchestration, risk, routing, authority, evidence, gates, arbitration | none; coordinates rather than competes |
 | Kiro | specification/design/task planning, AWS specialist, Kiro-native workflows | implementation, review |
 | Claude Code | large-codebase engineering, refactoring, deep codebase reasoning | implementation, challenger/reviewer |
 | Codex | implementation, debugging, testing, repository execution | review/challenge, focused planning |
@@ -238,12 +243,12 @@ R4 -> R3 + explicit human approval before destructive/external side effects
 ```text
 VS Code
   |
-  +-- Code Conductor Extension (thin)
+  +-- Architect Code Coductor Extension (thin)
   |      +-- task intake/status
   |      +-- Team / Runs / Gates / Connections / Packs / Usage
   |      +-- deep-links to native provider/editor surfaces
   |
-  +-- Code Conductor Core
+  +-- Architect Code Coductor Core
          |
          +-- optional ccon CLI/TUI
          +-- Policy + Risk + DAG + Evidence
@@ -304,7 +309,7 @@ No model wins merely because it is more capable or expensive. Context optimizati
 
 ## Authentication boundary
 
-Code Conductor never becomes the credential vault for consumer subscriptions. Vendor clients authenticate through their supported official mechanisms. Conductor may report health/presence and warn about billing-mode conflicts without printing or persisting secret values.
+Architect Code Coductor never becomes the credential vault for consumer subscriptions. Vendor clients authenticate through their supported official mechanisms. Conductor may report health/presence and warn about billing-mode conflicts without printing or persisting secret values.
 
 ## Deployment baseline
 
@@ -312,11 +317,11 @@ v0.1 is local/workstation-first:
 
 - VS Code on the operator workstation
 - WSL2/dev container recommended where stronger Linux sandbox/tool compatibility is useful
-- local Code Conductor core plus optional `ccon` CLI/TUI
+- local Architect Code Coductor core plus optional `ccon` CLI/TUI
 - local runtime state/cache
 - Git worktrees on local disk
 - outbound HTTPS/OAuth to GitHub and vendor/cloud services
-- no always-on Code Conductor daemon required
+- no always-on Architect Code Coductor daemon required
 
 No always-on cloud control plane or standalone desktop application is required for v0.1.
 
@@ -335,7 +340,7 @@ Production artifacts must be CI-built and traceable to source/release provenance
 ## Non-goals for v0.1
 
 - replacing vendor chat UIs
-- building a standalone Code Conductor desktop app
+- building a standalone Architect Code Coductor desktop app
 - hosting a proprietary model gateway
 - scraping consumer AI web sessions
 - building a custom APM replacement

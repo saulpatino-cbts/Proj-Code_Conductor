@@ -35,7 +35,7 @@ passes vacuously:
 
 Every gate declares what must already be present. A missing tool or missing installed
 dependencies make the gate a **blocking failure without executing anything**, advisory
-gates included. The evidence names what is missing and what you can do. Code Conductor
+gates included. The evidence names what is missing and what you can do. Architect Code Coductor
 never runs `npm ci`, `terraform init` or any other installer for you: install scripts and
 provider plugins are repository-chosen code and network fetches that you decide to run.
 A gate with unmet prerequisites is listed in the approval summary but is not part of
@@ -62,13 +62,13 @@ approval does not bind them. The approval summary says so.
 
 Gate commands run without a shell, in their own session and process group on POSIX. They
 have no controlling terminal, so they cannot draw over an approval prompt.
-- **Timeout:** each gate has a timeout (default 10 minutes). On timeout, Code Conductor
+- **Timeout:** each gate has a timeout (default 10 minutes). On timeout, Architect Code Coductor
   terminates the whole process group, then kills it if it has not exited after five
   seconds.
 - **Leftover processes:** processes the gate leaves in its group are killed as soon as
   it exits. If a process that left the group still holds the output pipes, Code
   Conductor stops reading after five seconds.
-- **Interruption:** gate groups are reaped when Code Conductor exits or is interrupted
+- **Interruption:** gate groups are reaped when Architect Code Coductor exits or is interrupted
   (Ctrl-C, `SIGTERM`, `SIGHUP`), the same as provider clients.
 - **Output:** at most 4 MiB is captured per stream, decoded once so multi-byte characters
   are not split. Truncation is stated in the evidence. The evidence `sha256` covers the

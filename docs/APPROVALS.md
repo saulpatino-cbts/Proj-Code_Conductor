@@ -2,7 +2,7 @@
 
 Implements C02 from #32/#44. Decision: [ADR 0013](adr/0013-pre-action-approvals-bound-to-exact-context.md), D-059.
 
-Code Conductor asks a person **immediately before** each consequential action and binds
+Architect Code Coductor asks a person **immediately before** each consequential action and binds
 the answer to the exact context that action will use. Workstation trust, client
 installation, a successful smoke test and a final `ready` decision are not approval.
 
@@ -13,7 +13,7 @@ installation, a successful smoke test and a final `ready` decision are not appro
 | `local_execution` | before starting a provider client process, including every retry | run, task, assignment, attempt, recipient `provider/harness@surface`, working directory, HEAD revision, working-tree content, exact client argv (prompt redacted), surface, authority, billing channel |
 | `context_disclosure` | before sending the task prompt and repository access to a provider, including every retry | attempt, recipient, working directory, HEAD revision, working-tree content, prompt SHA-256 and byte length |
 | `local_execution` (gates) | before running the target repository's deterministic gate commands | validation directory, HEAD revision, working-tree content, digest of the exact planned commands (profile, gate, command, resolved file, interpreter arguments such as Windows npm's `npm-cli.js`, gate arguments, timeout, unmet prerequisites) |
-| `commit` | before Code Conductor commits agent changes | agent worktree, HEAD revision, exact Git tree to be committed, agent branch, base SHA, changed-file list |
+| `commit` | before Architect Code Coductor commits agent changes | agent worktree, HEAD revision, exact Git tree to be committed, agent branch, base SHA, changed-file list |
 | `deployment` | API for native pipeline connectors | recipient pipeline/environment plus deployment-specific bindings |
 
 A provider's start and disclosure requests are shown together and recorded separately.
@@ -21,7 +21,7 @@ Each recipient needs its own approval, so approving disclosure to one provider n
 approves another. A retry is a new process and a new disclosure, so it is approved again
 against the then-current working tree; a refused retry is not started. Repository content
 is identified by HEAD plus the Git tree of every tracked file and every untracked
-non-ignored file. Code Conductor hashes every file into a temporary index seeded from HEAD
+non-ignored file. Architect Code Coductor hashes every file into a temporary index seeded from HEAD
 without stat data, so stat-cache settings such as `core.checkStat=minimal` cannot hide an
 edit, and the repository's own index and files are not changed. A sparse-checkout
 (skip-worktree) path keeps its HEAD content only while it is absent from disk; a file that
@@ -39,7 +39,7 @@ requests and requires identical digests before acting. The action does not run w
 - anything bound changed while the request waited, such as a new commit, an edited
   file, a different prompt or recipient (`changed`).
 
-Commits are exact, and there is no unapproved commit path. Code Conductor re-hashes the
+Commits are exact, and there is no unapproved commit path. Architect Code Coductor re-hashes the
 worktree and refuses if it no longer equals the approved tree, or if the branch moved from
 the approved HEAD. Otherwise it creates the commit from the approved tree object itself
 (`git commit-tree` plus a compare-and-swap `update-ref`). No staging step, stat cache or
@@ -48,14 +48,14 @@ force-adding an ignored file) are never committed. Whether a commit is needed at
 decided by content, not `git status`. An agent edit that preserves size and mtime still
 needs an approved commit, and so do new folders or untracked files hidden by
 `status.showUntrackedFiles=no`. The displayed file list, the sensitive-path check and the
-bound tree all come from the same snapshot. Every Code Conductor Git call ignores replace
+bound tree all come from the same snapshot. Every Architect Code Coductor Git call ignores replace
 refs (`--no-replace-objects`), so a `refs/replace/*` entry cannot make the listed files
 differ from the tree that is committed, and submodule pointer changes are listed even when
-`.gitmodules` says to ignore them. Code Conductor's commits use its own identity, even
+`.gitmodules` says to ignore them. Architect Code Coductor's commits use its own identity, even
 when `GIT_AUTHOR_*` or `GIT_COMMITTER_*` variables are inherited, and are not signed with
 your key.
 
-Code Conductor never runs repository Git hooks (`pre-commit`, `post-checkout`, a
+Architect Code Coductor never runs repository Git hooks (`pre-commit`, `post-checkout`, a
 husky-style `core.hooksPath`, and so on) or a configured `core.fsmonitor` from its own Git
 operations. Every call points `core.hooksPath` at an existing non-directory, under which
 no hook can exist: `/dev/null` on POSIX, and the running executable on Windows. A hooks
@@ -63,9 +63,9 @@ path in a shared temporary directory would not be safe, because its name is visi
 process arguments and could be created by another process or user. Hooks and fsmonitor
 are repository-controlled programs, so running them would be unapproved local execution.
 
-Git configuration defines further programs that Code Conductor's own `git add` runs
+Git configuration defines further programs that Architect Code Coductor's own `git add` runs
 (clean and process filters), and grafts or a shallow file change which history Git
-reports. Code Conductor therefore records a digest of the effective configuration of
+reports. Architect Code Coductor therefore records a digest of the effective configuration of
 every scope, includes followed, and of `info/attributes`, `info/grafts`, `shallow` and
 `objects/info/alternates`, one digest per file, plus the Git directory each worktree
 uses. It reads them the first time it meets a directory in a run. Git reports
@@ -83,7 +83,7 @@ with those first readings:
 - right before committing;
 - before gate commands.
 
-If anything changed, Code Conductor stops the run without running further Git operations
+If anything changed, Architect Code Coductor stops the run without running further Git operations
 under configuration it has not seen. The assignment and every later one are `blocked`,
 the run is `human_required`, and agent changes stay uncommitted. The stop names each
 configuration file, control file or nested repository that changed, appeared or
@@ -102,20 +102,20 @@ writing `branch.*` keys, or `git fetch` or `gc` rewriting `shallow`. These chang
 your own checkout too, so review them and run again.
 
 Commits the agent makes itself happen under its own sandbox, not through an approval
-here. Code Conductor names them in the commit approval, the result's risks and its
+here. Architect Code Coductor names them in the commit approval, the result's risks and its
 evidence, and checks every path any of them touched, including paths a later commit
 removed again, because their content stays in history. A sensitive path in that history
-blocks the assignment, and Code Conductor commits nothing on top. A branch the agent
+blocks the assignment, and Architect Code Coductor commits nothing on top. A branch the agent
 reset or rewrote so that it no longer descends from its base is flagged too. Either
 makes the run `human_required`.
 
 Reviewers and gate commands then run in the builder's worktree, and anything they leave
-running can still write there. Before the gate commands run, Code Conductor compares the
+running can still write there. Before the gate commands run, Architect Code Coductor compares the
 worktree's content with its HEAD commit (the same content-exact comparison the commit path
 uses): an edit a read-only assignment left behind, or one made by something it started,
 names the paths and the steps that ran there, runs no gate and makes the run
 `human_required`, because gate evidence would otherwise describe content that `ccon pr`
-never pushes (#111). Before the merge decision, Code Conductor checks that the
+never pushes (#111). Before the merge decision, Architect Code Coductor checks that the
 worktree's history still ends where the builder's check left it. Commits added since are
 named, scanned and checked the same way, with the steps that ran there. They make the run
 `human_required`, and a credential, a sensitive path or a deleted branch blocks it. A write
@@ -136,7 +136,7 @@ controlling terminal. They cannot open `/dev/tty` or inject keystrokes into the 
 prompt. Processes they leave in their group are terminated when they exit, or when Code
 Conductor exits or is interrupted. A client that ignores `SIGTERM` after its timeout is
 killed after five seconds. If a descendant keeps the client's output pipes open after the
-client exits, Code Conductor stops reading after five seconds rather than wait for it.
+client exits, Architect Code Coductor stops reading after five seconds rather than wait for it.
 
 This is containment, not a security boundary. A process running as you can start its own
 session to leave the group. It can also write to your terminal through `/proc`, for

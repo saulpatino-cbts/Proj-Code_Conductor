@@ -1,34 +1,74 @@
-# Code Conductor
+# Architect Code Coductor
 
-Code Conductor is a **VS Code-centered, multi-provider agent engineering system**. It coordinates subscription-backed AI clients, reusable APM agent packs, official MCP tools/references, safe context preparation, Git worktrees, GitHub pull requests, deterministic quality gates, and human approval without collapsing every provider into a generic chat interface.
+**Architect Code Coductor** is a cloud-architect-first product direction built on
+the repository's existing VS Code-centered, multi-provider orchestration
+foundation. It is intended to help architects move from requirements through
+official cloud research, architecture options and decisions, reviewable diagrams
+and IaC proposals, independent challenge, deterministic checks, and
+human-controlled handoff—without treating any model, agent, or cloud provider as
+the authority.
+
+This is a product priority, not a claim that the full cloud-architecture
+lifecycle is already shipped. The current repository provides general planning
+and orchestration, provider/harness boundaries, isolated worktrees, structured
+evidence, human approval checkpoints, and configured deterministic validation.
+Cloud-specific research coverage, diagram generation, IaC proposal workflows,
+and Well-Architected assessment are not guaranteed built-in capabilities.
+Read the [architect workflow and current capability boundaries](docs/ARCHITECT-WORKFLOW.md)
+before relying on a stage as implemented.
+
+The GitHub repository remains `Proj-Code_Conductor`, and the immutable VS Code
+extension/package identifier remains `code-conductor-vscode`. Current-source
+development builds use the display name **Architect Code Coductor**; released
+v0.1.3 remains branded **Code Conductor** and exposes **Code Conductor: Doctor**.
+The `ccon` command, public contracts, package IDs, configuration, and local
+state paths are not renamed. Exact historical release records and accepted
+ADRs retain their original wording. See the naming/compatibility policy in the
+workflow document.
 
 ## Status
 
-**Target:** v0.1 workstation/VS Code release  
-**Current checkpoint:** [Code Conductor 0.1.2 (beta)](https://github.com/saulpatinojr/Proj-Code_Conductor/releases/tag/v0.1.2) is published as a GitHub pre-release (2026-10-21): download `code-conductor-0.1.2.vsix`, check it with `sha256sum -c SHA256SUMS` and `gh attestation verify code-conductor-0.1.2.vsix --repo saulpatinojr/Proj-Code_Conductor`, then `code --install-extension code-conductor-0.1.2.vsix`. Version 0.1.1 was validated on Windows 11 under issue #4; 0.1.2 has not yet been installed on a clean machine. See [`docs/INSTALL.md`](docs/INSTALL.md) and [`docs/STATUS.md`](docs/STATUS.md) for the limits.
+**Target:** architect-first workflow, built incrementally on the v0.1 workstation/VS Code foundation.
+**Current checkpoint:** [Code Conductor 0.1.3](https://github.com/saulpatinojr/Proj-Code_Conductor/releases/tag/v0.1.3) was published on GitHub (2026-11-07) under the compatibility identity; it does not itself implement the cloud-architect direction. Its Marketplace publish job was denied because the publisher had not granted the principal permission to publish new extensions ([workflow run 42345472964](https://github.com/saulpatinojr/Proj-Code_Conductor/actions/runs/42345472964)); GitHub release publication is not Marketplace publication. See [`docs/STATUS.md`](docs/STATUS.md) for release and validation limits, and [`docs/INSTALL.md`](docs/INSTALL.md) for installation.
 
-See [`docs/STATUS.md`](docs/STATUS.md) for the maintained checkpoint and GitHub issue **#7** for the durable product roadmap/backlog.
+See [`docs/STATUS.md`](docs/STATUS.md) for the maintained checkpoint, GitHub issue **#7** for the durable product roadmap/backlog, and the [architect-prioritized open-issue assessment](docs/ARCHITECT-ISSUE-PRIORITIES.md) for evidence-based feasibility and priority.
+
+## Architect workflow
+
+The target workflow is **requirements → official-source research → options and
+trade-offs → reviewable architecture/ADR/diagram and IaC proposal → independent
+security, resilience, cost, and architecture challenge → configured
+deterministic validation → explicit human approval and native handoff**.
+Evaluate security, resilience, cost, operations, performance, and sustainability
+explicitly. Azure, AWS, and Google Cloud remain options selected from requirements
+and evidence.
+
+Current planning, orchestration, evidence, approval, and validation foundations
+support parts of this path; source-backed cloud research, diagrams, IaC, and
+cloud-specific independent assessments depend on configured tools/specialists
+and are not claimed as complete. See [`docs/ARCHITECT-WORKFLOW.md`](docs/ARCHITECT-WORKFLOW.md)
+for stage-by-stage shipped-versus-direction status and safety boundaries.
 
 ## Product shape
 
-Code Conductor v0.x is intentionally **not another standalone desktop app**.
+Architect Code Coductor v0.x is intentionally **not another standalone desktop app**.
 
 - VS Code is the primary graphical cockpit.
-- The Code Conductor extension stays thin and deep-links into native provider/editor/terminal/diff/SCM/PR surfaces.
+- The Architect Code Coductor extension stays thin and deep-links into native provider/editor/terminal/diff/SCM/PR surfaces.
 - An optional thin `ccon` CLI/TUI uses the same versioned core/runtime.
-- The packaged extension now bundles the compiled Code Conductor runtime; clean-machine validation and Marketplace publication still must prove customers do not need this source tree or a local `npm run build` step.
+- The packaged extension bundles the compiled runtime; clean-machine installation remains unverified, and Marketplace publication is blocked by the publisher permission recorded in [`docs/STATUS.md`](docs/STATUS.md).
 - First run performs explicit local discovery/bootstrap; subsequent starts use cached non-secret state and lazy provider/MCP/APM activation.
 
 ### Sibling product: Code Workflow
 
-[Code Workflow](https://github.com/saulpatinojr/Proj-Code_Workflow) is the slim, in-client sibling. It runs multi-agent workflows inside one AI client (Claude Code, Codex CLI, or GitHub Copilot) through that client's own subagents, installs with one script, and has no background runtime. Code Conductor remains the full cross-provider program: routing, risk classes, independence, worktrees, gates, and human approval. Work exported from Code Workflow (`workflow.py export`) can be brought under Code Conductor review with `ccon import <run-manifest.json>`; import never establishes readiness. The boundary and the shared `AgentResult`/`RunManifest` contract are locked in [ADR 0011](docs/adr/0011-code-workflow-sibling-boundary-and-shared-contract.md) (D-057).
+[Code Workflow](https://github.com/saulpatinojr/Proj-Code_Workflow) is the slim, in-client sibling. It runs multi-agent workflows inside one AI client (Claude Code, Codex CLI, or GitHub Copilot) through that client's own subagents, installs with one script, and has no background runtime. Architect Code Coductor remains the full cross-provider program: routing, risk classes, independence, worktrees, gates, and human approval. Work exported from Code Workflow (`workflow.py export`) can be brought under Architect Code Coductor review with `ccon import <run-manifest.json>`; import never establishes readiness. The boundary and the shared `AgentResult`/`RunManifest` contract are locked in [ADR 0011](docs/adr/0011-code-workflow-sibling-boundary-and-shared-contract.md) (D-057).
 
 ## Architecture at a glance
 
 | Layer | Responsibility |
 |---|---|
 | VS Code | Human cockpit and native editor/terminal/diff/SCM/provider surfaces |
-| Code Conductor | Task DAG, routing, risk, authority, context policy, evidence, arbitration, readiness |
+| Architect Code Coductor | Task DAG, routing, risk, authority, context policy, evidence, arbitration, readiness |
 | Surface-aware harness adapters | Native extensions, CLI/headless, ACP, MCP, platform workflows/APIs, manual lanes, provider-native agents/subagents/skills/hooks/plugins |
 | Context preparation | Provider-neutral, workspace-bounded context reduction; lossless by default, aggressive only by explicit opt-in |
 | Microsoft APM | Agent-pack dependency, distribution, lock, projection, integrity, drift |
@@ -38,35 +78,35 @@ Code Conductor v0.x is intentionally **not another standalone desktop app**.
 | GitHub | Repository, PR, Actions, review, and merge source of truth |
 | Human owner | Final authority for consequential/destructive operations |
 
-The repository constitution is [`AGENTS.md`](AGENTS.md). Locked architectural decisions are in [`docs/DECISIONS.md`](docs/DECISIONS.md). The context-optimization boundary is recorded in ADR 0007, the thin-client/startup model in ADR 0008, and the surface-aware harness/provider-specialization model in ADR 0009.
+The repository constitution is [`AGENTS.md`](AGENTS.md). Locked architectural decisions are in [`docs/DECISIONS.md`](docs/DECISIONS.md); the architect-first priority is ADR 0020 / D-081. The context-optimization boundary is recorded in ADR 0007, the thin-client/startup model in ADR 0008, and the surface-aware harness/provider-specialization model in ADR 0009.
 
 ## Team model
 
-Code Conductor separates **provider, model, harness, surface, billing channel, role, stance, specialization, tools, authority, and risk clearance**. Primary specialization is a routing preference, not exclusivity.
+Architect Code Coductor separates **provider, model, harness, surface, billing channel, role, stance, specialization, tools, authority, and risk clearance**. Primary specialization is a routing preference, not exclusivity.
 
-| Provider / platform | Primary Code Conductor specialization |
+| Provider / platform | Primary Architect Code Coductor specialization |
 |---|---|
-| **Kiro** | specification/design/task planning, AWS specialist, Kiro-native workflows; preferred Code Conductor boundary is `kiro-cli acp` where policy/workstation validation permits it |
+| **Kiro** | specification/design/task planning, AWS specialist, Kiro-native workflows; preferred Architect Code Coductor boundary is `kiro-cli acp` where policy/workstation validation permits it |
 | **Claude Code** | large-codebase engineering, refactoring, deep codebase reasoning |
 | **Codex** | implementation, debugging, testing, repository execution |
 | **GitHub Copilot / GitHub** | GitHub-native Gatekeeper for PR review/re-review, Actions/PR state, repository/merge context |
 | **Perplexity** | external research discovery/synthesis; Pro subscription mode remains human-in-the-loop unless separately billed official MCP/API automation is explicitly enabled |
 | **Google Antigravity** | Google/GCP specialist and alternate independent worker/reviewer; unattended execution remains gated by validated authority/sandbox behavior |
-| **Code Conductor** | orchestration, risk, routing, authority, evidence, gates, arbitration; it coordinates rather than competes with the specialists |
+| **Architect Code Coductor** | orchestration, risk, routing, authority, evidence, gates, arbitration; it coordinates rather than competes with the specialists |
 
-Provider-native subagents, skills, hooks, commands/plugins/Powers, sessions, permissions, and MCP capabilities should remain available where officially supported. Cross-provider AI invocation remains mediated by Code Conductor so worktree ownership, billing channel, authority, evidence, and readiness are not bypassed.
+Provider-native subagents, skills, hooks, commands/plugins/Powers, sessions, permissions, and MCP capabilities should remain available where officially supported. Cross-provider AI invocation remains mediated by Architect Code Coductor so worktree ownership, billing channel, authority, evidence, and readiness are not bypassed.
 
 Important work can add independent constructive, critical/challenger, neutral validator, security, arbiter, and finalizer roles according to risk.
 
 ## Agent and skill platform
 
-Specialist agents, skills, instructions and prompts come from the Agent Packs repository ([`saulpatinojr/Proj-Agent_Packs`](https://github.com/saulpatinojr/Proj-Agent_Packs)), installed through APM from its mirror **`hybridcloudworks/Proj-AgentPacks`** at a pinned reference (`apm install hybridcloudworks/Proj-AgentPacks` installs the whole catalog; `-g` puts it in the user profile for every client); the same packs serve the slim sibling, [Code Workflow](https://github.com/saulpatinojr/Proj-Code_Workflow). Code Conductor ships no agent files (ADR 0015). `.apm/` here holds only Code Conductor's own skills, and the roles in `config/roles.yaml` carry the rules the runtime renders into every assignment prompt. Harness-specific projections are generated/materialized rather than manually maintained as divergent copies.
+Specialist agents, skills, instructions and prompts come from the Agent Packs repository ([`saulpatinojr/Proj-Agent_Packs`](https://github.com/saulpatinojr/Proj-Agent_Packs)), installed through APM from its mirror **`hybridcloudworks/Proj-AgentPacks`** at a pinned reference (`apm install hybridcloudworks/Proj-AgentPacks` installs the whole catalog; `-g` puts it in the user profile for every client); the same packs serve the slim sibling, [Code Workflow](https://github.com/saulpatinojr/Proj-Code_Workflow). Architect Code Coductor ships no agent files (ADR 0015). `.apm/` here holds only Architect Code Coductor's own skills, and the roles in `config/roles.yaml` carry the rules the runtime renders into every assignment prompt. Harness-specific projections are generated/materialized rather than manually maintained as divergent copies.
 
 The user's larger legacy agent/skill library is tracked as a dedicated migration workstream in issue #13. The immutable inventory/lineage intake mechanism is implemented; the actual corpus review and migration are still pending. The migration rule is **100% source-lineage coverage**: every original file is preserved/inventoried and receives a canonical destination or explicit duplicate/superseded disposition before retirement. The goal is modular APM packages with lean personas, reusable deep skills/references, and provider overlays only for genuine harness differences.
 
 ## Quick start
 
-To use Code Conductor in your own repositories, install the VS Code extension from a
+To use Architect Code Coductor in your own repositories, install the VS Code extension from a
 release `.vsix`; no clone or build is needed. Prerequisites, compatibility, updates and
 uninstalling are in [`docs/INSTALL.md`](docs/INSTALL.md).
 
@@ -112,6 +152,8 @@ Do not enable unattended paid-client execution until the appropriate **surface-s
 
 Start with [`docs/README.md`](docs/README.md). Key documents include:
 
+- [`docs/ARCHITECT-WORKFLOW.md`](docs/ARCHITECT-WORKFLOW.md) — authoritative architect workflow, capability status and naming exceptions.
+- [`docs/ARCHITECT-ISSUE-PRIORITIES.md`](docs/ARCHITECT-ISSUE-PRIORITIES.md) — evidence-based prioritization and completion feasibility of open issues.
 - [`STARTER.md`](STARTER.md) — short continuity handoff for a new work session.
 - [`docs/STATUS.md`](docs/STATUS.md) — current implementation checkpoint.
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — system design and boundaries.
@@ -124,12 +166,12 @@ Start with [`docs/README.md`](docs/README.md). Key documents include:
 ## Repository truth model
 
 - GitHub issue #7 / the linked GitHub Project is the durable product roadmap/backlog once the Project is created.
-- `.apm/` holds Code Conductor's own skills only; specialist packs come from Agent Packs through APM (ADR 0015). `apm.yml` pins the packs this repository works with to a tagged commit, and the files under `.claude/`, `.codex/`, `.github/`, `.kiro/` and `.agents/` that APM materializes from them are generated state recorded in `apm.lock.yaml`, not sources to edit here.
+- `.apm/` holds Architect Code Coductor's own skills only; specialist packs come from Agent Packs through APM (ADR 0015). `apm.yml` pins the packs this repository works with to a tagged commit, and the files under `.claude/`, `.codex/`, `.github/`, `.kiro/` and `.agents/` that APM materializes from them are generated state recorded in `apm.lock.yaml`, not sources to edit here.
 - `apm.yml` declares package targets/dependencies.
 - `apm.lock.yaml` and harness-specific projections are generated/materialized state and are committed for reproducibility; do not hand-edit the lockfile.
-- `config/mcp-catalog.yaml` is Code Conductor's policy-driven MCP catalog. `.github/mcp.json` is a minimal Copilot CLI repository configuration, not a second catalog.
+- `config/mcp-catalog.yaml` is Architect Code Coductor's policy-driven MCP catalog. `.github/mcp.json` is a minimal Copilot CLI repository configuration, not a second catalog.
 - Git is code-state truth; GitHub is PR/CI/review/merge truth.
-- Code Conductor run/evidence state is runtime truth, not a replacement for Git/GitHub.
+- Architect Code Coductor run/evidence state is runtime truth, not a replacement for Git/GitHub.
 - Chat is design collaboration, not durable product truth; approved substantive ideas are captured in GitHub issues/ADRs/config/tests before they are considered preserved.
 
 ## Contributing and security

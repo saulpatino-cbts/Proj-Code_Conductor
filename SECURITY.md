@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Code Conductor is pre-1.0. Security fixes are applied to the current `main` branch. No older release line is currently supported.
+Architect Code Coductor is pre-1.0. Security fixes are applied to the current `main` branch. No older release line is currently supported.
 
 ## Reporting a vulnerability
 
@@ -21,7 +21,7 @@ A useful report includes:
 
 ## Security boundaries
 
-Code Conductor follows these baseline rules:
+Architect Code Coductor follows these baseline rules:
 
 - consumer OAuth/session credentials stay in official vendor clients and credential stores;
 - separately billed API execution is disabled by default;

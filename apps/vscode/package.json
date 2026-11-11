@@ -1,7 +1,7 @@
 {
   "name": "code-conductor-vscode",
-  "displayName": "Code Conductor",
-  "description": "VS Code cockpit for the Code Conductor multi-provider agent engineering team.",
+  "displayName": "Architect Code Coductor",
+  "description": "VS Code cockpit for the cloud-architect-first Architect Code Coductor workflow.",
   "version": "0.1.3",
   "private": true,
   "type": "module",
@@ -50,95 +50,95 @@
     "commands": [
       {
         "command": "codeConductor.refresh",
-        "title": "Code Conductor: Refresh Local Discovery",
+        "title": "Architect Code Coductor: Refresh Local Discovery",
         "icon": "$(refresh)"
       },
       {
         "command": "codeConductor.refreshRuns",
-        "title": "Code Conductor: Refresh Runs",
+        "title": "Architect Code Coductor: Refresh Runs",
         "icon": "$(refresh)"
       },
       {
         "command": "codeConductor.doctor",
-        "title": "Code Conductor: Doctor",
+        "title": "Architect Code Coductor: Doctor",
         "icon": "$(heart)"
       },
       {
         "command": "codeConductor.validate",
-        "title": "Code Conductor: Validate Repository",
+        "title": "Architect Code Coductor: Validate Repository",
         "icon": "$(verified)"
       },
       {
         "command": "codeConductor.plan",
-        "title": "Code Conductor: Plan Task",
+        "title": "Architect Code Coductor: Plan Task",
         "icon": "$(add)"
       },
       {
         "command": "codeConductor.openDecisions",
-        "title": "Code Conductor: Open Decision Register",
+        "title": "Architect Code Coductor: Open Decision Register",
         "icon": "$(book)"
       },
       {
         "command": "codeConductor.nextActions",
-        "title": "Code Conductor: Show Next Actions for Run"
+        "title": "Architect Code Coductor: Show Next Actions for Run"
       },
       {
         "command": "codeConductor.performAction",
-        "title": "Code Conductor: Perform Next Action"
+        "title": "Architect Code Coductor: Perform Next Action"
       },
       {
         "command": "codeConductor.openRun",
-        "title": "Code Conductor: Open Run Summary"
+        "title": "Architect Code Coductor: Open Run Summary"
       },
       {
         "command": "codeConductor.openFile",
-        "title": "Code Conductor: Open Configuration File"
+        "title": "Architect Code Coductor: Open Configuration File"
       },
       {
         "command": "codeConductor.signIn",
-        "title": "Code Conductor: Official Sign-in Guidance"
+        "title": "Architect Code Coductor: Official Sign-in Guidance"
       },
       {
         "command": "codeConductor.selectWorkspace",
-        "title": "Code Conductor: Select Repository",
+        "title": "Architect Code Coductor: Select Repository",
         "icon": "$(folder)"
       },
       {
         "command": "codeConductor.knowledge",
-        "title": "Code Conductor: Browse Knowledge"
+        "title": "Architect Code Coductor: Browse Knowledge"
       },
       {
         "command": "codeConductor.connectKnowledge",
-        "title": "Code Conductor: Connect Knowledge Vault"
+        "title": "Architect Code Coductor: Connect Knowledge Vault"
       },
       {
         "command": "codeConductor.disconnectKnowledge",
-        "title": "Code Conductor: Disconnect Knowledge Vault"
+        "title": "Architect Code Coductor: Disconnect Knowledge Vault"
       },
       {
         "command": "codeConductor.inspectPacks",
-        "title": "Code Conductor: Inspect Pack Provenance"
+        "title": "Architect Code Coductor: Inspect Pack Provenance"
       },
       {
         "command": "codeConductor.auditPacks",
-        "title": "Code Conductor: Audit Packs"
+        "title": "Architect Code Coductor: Audit Packs"
       },
       {
         "command": "codeConductor.previewPacks",
-        "title": "Code Conductor: Preview Pack Projections"
+        "title": "Architect Code Coductor: Preview Pack Projections"
       },
       {
         "command": "codeConductor.openEvidence",
-        "title": "Code Conductor: Open Stored Gate Evidence"
+        "title": "Architect Code Coductor: Open Stored Gate Evidence"
       },
       {
         "command": "codeConductor.setupOrchestrator",
-        "title": "Code Conductor: Orchestrator Interview / Redo",
+        "title": "Architect Code Coductor: Orchestrator Interview / Redo",
         "icon": "$(comment-discussion)"
       },
       {
         "command": "codeConductor.inspectOrchestrator",
-        "title": "Code Conductor: Inspect Orchestrator Status",
+        "title": "Architect Code Coductor: Inspect Orchestrator Status",
         "icon": "$(list-tree)"
       }
     ],
@@ -146,7 +146,7 @@
       "activitybar": [
         {
           "id": "codeConductor",
-          "title": "Code Conductor",
+          "title": "Architect Code Coductor",
           "icon": "media/conductor.svg"
         }
       ]
@@ -157,19 +157,19 @@
           "id": "codeConductor.runs",
           "name": "Runs",
           "icon": "media/conductor.svg",
-          "contextualTitle": "Code Conductor runs"
+          "contextualTitle": "Architect Code Coductor runs"
         },
         {
           "id": "codeConductor.workstation",
           "name": "Workstation",
           "icon": "media/conductor.svg",
-          "contextualTitle": "Code Conductor workstation"
+          "contextualTitle": "Architect Code Coductor workstation"
         },
         {
           "id": "codeConductor.policy",
           "name": "Policy",
           "icon": "media/conductor.svg",
-          "contextualTitle": "Code Conductor policy",
+          "contextualTitle": "Architect Code Coductor policy",
           "visibility": "collapsed"
         }
       ]
@@ -248,7 +248,7 @@
     "viewsWelcome": [
       {
         "view": "codeConductor.runs",
-        "contents": "Open a repository folder to use Code Conductor.\n[Open Folder](command:vscode.openFolder)",
+        "contents": "Open a repository folder to use Architect Code Coductor.\n[Open Folder](command:vscode.openFolder)",
         "when": "workbenchState == empty"
       },
       {
@@ -268,7 +268,7 @@
       },
       {
         "view": "codeConductor.workstation",
-        "contents": "This workspace is in Restricted Mode. Code Conductor discovers clients and runs processes only in a trusted workspace.\n[Manage Workspace Trust](command:workbench.trust.manage)",
+        "contents": "This workspace is in Restricted Mode. Architect Code Coductor discovers clients and runs processes only in a trusted workspace.\n[Manage Workspace Trust](command:workbench.trust.manage)",
         "when": "!isWorkspaceTrusted"
       }
     ]
