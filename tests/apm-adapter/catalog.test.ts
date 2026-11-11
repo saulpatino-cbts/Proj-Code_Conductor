@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { stringify } from 'yaml';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { CATALOG_MIRROR, catalogVersionId, fetchCatalogSelections, fetchPackCatalog, locallyPresentCatalogVersions, type CatalogRequest } from '../../packages/apm-adapter/src/catalog.js';
+import { CATALOG_MIRROR, catalogVersionId, fetchCatalogSelections, fetchPackCatalog, isCatalogVersionId, locallyPresentCatalogVersions, type CatalogRequest } from '../../packages/apm-adapter/src/catalog.js';
 
 const current = 'a'.repeat(40); const old = 'b'.repeat(40); const head = 'c'.repeat(40);
 const typescript = 'typescript-distinguished-engineer-pack'; const github = 'github-expert-engineer-pack';
@@ -32,6 +32,12 @@ const roots: string[] = [];
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); vi.restoreAllMocks(); });
 
 describe('on-demand canonical pack/version discovery', () => {
+  it('validates compound IDs with the canonical catalog SemVer rules', () => {
+    expect(isCatalogVersionId(catalogVersionId(identity()))).toBe(true);
+    for (const version of ['1', '1..2', '1.2.3-01']) {
+      expect(isCatalogVersionId(`${CATALOG_MIRROR.toLowerCase()}/${typescript}@${version}#${current}`)).toBe(false);
+    }
+  });
   it('keeps packs sharing a commit distinct and marks only the installed exact version', async () => {
     const { request, calls } = fixture();
     const catalog = await fetchPackCatalog([identity()], { request, now: () => new Date('2026-10-28T00:00:00Z') });

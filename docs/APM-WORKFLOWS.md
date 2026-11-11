@@ -110,6 +110,16 @@ This CLI foundation starts no APM/provider process and writes no project files.
 It does not extend the fixed two-pack projection preview, install a selected
 release, or expose the planned +/−/Save controls yet.
 
+The VS Code **Discover APM Pack Catalog** action runs this bounded request only
+after an explicit user command in the selected trusted workspace and keeps the
+CLI result visible in its task terminal. **Validate APM Catalog Selection**
+accepts a copied compound version ID and invokes `--select <id>`, which refetches
+canonical membership and checks package/version/target metadata. These actions
+surface candidate/selection metadata only; they do not establish signature,
+audit, trust, installation or runtime eligibility. A missing bundled CLI runtime
+is reported visibly without a fallback. Neither action runs during activation or
+changes APM files, installs packages, or starts providers, MCP servers or hooks.
+
 Inventory states mean only:
 
 | State | Evidence |

@@ -59,6 +59,17 @@ export function catalogVersionId(value: InstalledCatalogVersion): string {
   if (!object(value) || typeof value.mirror !== 'string' || value.mirror.toLowerCase() !== CATALOG_MIRROR.toLowerCase() || typeof value.path !== 'string' || !PACK.test(value.path) || !version(value.version) || typeof value.commit !== 'string' || !SHA.test(value.commit)) throw invalid();
   return `${CATALOG_MIRROR.toLowerCase()}/${value.path}@${value.version}#${value.commit}`;
 }
+export function isCatalogVersionId(value: unknown): value is string {
+  const prefix = `${CATALOG_MIRROR.toLowerCase()}/`;
+  if (typeof value !== 'string' || !value.startsWith(prefix)) return false;
+  const [, path, release, commit] = value.slice(prefix.length).match(/^([^@]+)@([^#]+)#([a-f0-9]{40})$/) ?? [];
+  if (!path || !release || !commit) return false;
+  try { return catalogVersionId({ mirror: CATALOG_MIRROR, path, version: release, commit }) === value; }
+  catch (error) {
+    if (error instanceof CatalogError) return false;
+    throw error;
+  }
+}
 function document(text: string): Record<string, unknown> {
   if (Buffer.byteLength(text) > MAX_BYTES) throw invalid();
   const parsed = parseDocument(text, { logLevel: 'silent' });

@@ -7,12 +7,12 @@ Architect Code Coductor v0.1 uses a thin VS Code extension rather than a replace
 Three views. Every row either opens the file it comes from, opens a run's summary, performs that run's next action, or shows sign-in guidance; the short label is the gist and the tooltip is the whole story.
 
 - **Runs** — the last 25 runs associated by canonical repository path with the selected workspace, from `~/.code-conductor/runs` (or `CODE_CONDUCTOR_HOME`), newest first, titled by objective with the decision and start time. A run expands into its decision, each assignment (role, client, status, recommendation, blocking findings), each gate, and its next actions; clicking a next action performs it (opens the worktree in Source Control, starts a read-only `ccon` command in a task terminal, or shows the exact command to copy; nothing pushes, signs in or starts a provider from the view, [`NATIVE-INTERFACES.md`](NATIVE-INTERFACES.md)). Clicking the run opens its summary as a read-only Markdown document: decision, assignments, gates, next actions, findings, risks, what the agents did not verify, worktrees and approvals. Title buttons: **Plan a Task**, **Refresh**. With no runs, the view says how a run works and offers **Plan a Task**.
-- **Workstation** — what this machine has, from cached discovery: **AI clients** (installed, not found, or manual platform; click for the official sign-in guidance; installed never means signed in or trusted, which **Doctor** checks), **Tools** (required ones in red when missing), **Gate profiles** (each profile's gates and whether they block; click opens `config/gates.yaml`) and **Packs** (APM dependencies, lock, own skills, targets; click opens the file). Optional **Knowledge** expands to Browse/Connect and, while connected, an explicit Disconnect action that forgets only the repository-scoped connection and preserves notes. Pack audit/preview actions are offered only when cached discovery and host support permit them; unavailable states explain the missing prerequisite. In a multi-root workspace with no selection, Workstation and Policy offer **Select Repository**. With no folder, the views explain how to open one. Title buttons: **Doctor**, **Refresh Local Discovery**. In Restricted Mode they offer Workspace Trust instead.
+- **Workstation** — what this machine has, from cached discovery: **AI clients** (installed, not found, or manual platform; click for the official sign-in guidance; installed never means signed in or trusted, which **Doctor** checks), **Tools** (required ones in red when missing), **Gate profiles** (each profile's gates and whether they block; click opens `config/gates.yaml`) and **Packs** (APM dependencies, lock, own skills, targets; click opens the file). Pack catalog discovery and selection validation are explicit on-demand commands; no catalog request occurs at activation. Optional **Knowledge** expands to Browse/Connect and, while connected, an explicit Disconnect action that forgets only the repository-scoped connection and preserves notes. Pack audit/preview actions are offered only when cached discovery and host support permit them; unavailable states explain the missing prerequisite. In a multi-root workspace with no selection, Workstation and Policy offer **Select Repository**. With no folder, the views explain how to open one. Title buttons: **Doctor**, **Refresh Local Discovery**. In Restricted Mode they offer Workspace Trust instead.
 - **Policy** (collapsed by default) — **Roles** with their stance, preferred clients and the rules rendered into their prompts (click opens `config/roles.yaml`), **Risk classes** (which roles each needs, and which need human approval), **Billing** (subscriptions only, or separately billed API allowed) and the decision register.
 
 ## Commands
 
-Refresh local discovery, refresh runs, Doctor, repository validation, task planning (objective and risk class, with each class explained), the decision register, and the internal commands the views use (open run summary, perform next action, open configuration file, sign-in guidance). Execution remains in the Architect Code Coductor CLI and official vendor clients: `ccon run … --execute` runs in a terminal, where each consequential step asks for approval. Terminal output, source control, diffs, GitHub PRs, and native agent sessions stay in their existing VS Code surfaces.
+Refresh local discovery, refresh runs, Doctor, repository validation, task planning (objective and risk class, with each class explained), the decision register, on-demand APM catalog discovery and selection validation, and the internal commands the views use (open run summary, perform next action, open configuration file, sign-in guidance). Execution remains in the Architect Code Coductor CLI and official vendor clients: `ccon run … --execute` runs in a terminal, where each consequential step asks for approval. Terminal output, source control, diffs, GitHub PRs, and native agent sessions stay in their existing VS Code surfaces.
 
 ## Deliberate non-features
 
@@ -123,6 +123,18 @@ staged project and compare exact files/hashes against this repository. It rechec
 trust and repository selection after the picker. The terminal JSON names
 conflicts and limits the result to selected pack projections; it does not claim
 a complete native installation diff or grant installation approval.
+
+**Discover APM Pack Catalog** explicitly runs the bounded
+`ccon apm-catalog --repo <workspace>` read-only catalog request in a visible task
+terminal. **Validate APM Catalog Selection** accepts one compound version ID
+copied from that output and explicitly runs the CLI's `--select <id>` membership
+and package-metadata validation. Both require a selected trusted repository.
+Catalog output is candidate metadata; it does not establish a signature, audit,
+trust, installation state, approval or runtime eligibility. Neither command
+installs packages, edits APM files, or invokes providers, MCP servers or hooks.
+No catalog request runs on extension activation. If the bundled CLI is missing,
+the command reports the existing visible runtime-unavailable error rather than
+falling back to another executable.
 
 Installation/update/removal and metadata/local-source merging remain separate.
 See [APM workflows](APM-WORKFLOWS.md).
