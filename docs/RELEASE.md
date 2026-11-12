@@ -32,8 +32,10 @@ sign nor write:
    - the tagged commit is on `main` (`refs/remotes/origin/main`, by its full name, so
      that a tag cannot impersonate the branch);
    - the `VSCE_PUBLISHER` repository variable names the Marketplace publisher.
-2. It installs the locked dependencies (`npm ci --ignore-scripts`, no dependency cache),
-   then runs the dependency audit, typecheck, tests and repository validation.
+2. It sets up the pinned APM CLI and audits the committed package, lockfile, policy and
+   projections. It then installs the locked npm dependencies (`npm ci --ignore-scripts`,
+   no dependency cache) and runs the dependency audit, typecheck, tests and repository
+   validation.
 3. It packages the `.vsix` and runs the same installed-package smoke test as the release
    preflight on every pull request (see [`INSTALL.md`](INSTALL.md#validation)).
 4. It writes:

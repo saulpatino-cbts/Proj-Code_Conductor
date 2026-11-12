@@ -19,7 +19,7 @@
     "ccon:validate": "npm run build && node packages/cli/dist/index.js validate .",
     "ccon:doctor": "npm run build && node packages/cli/dist/index.js doctor .",
     "ccon:plan": "npm run build && node packages/cli/dist/index.js plan --repo . --risk R1 --objective 'Validate Architect Code Coductor planning'",
-    "build:ts": "npm run defaults:package && tsc -b",
+    "build:ts": "node scripts/package-defaults.mjs && node ./node_modules/typescript/bin/tsc -b",
     "build:vscode": "node scripts/build-vscode.mjs && node scripts/verify-vscode-bundle.mjs && node scripts/smoke-vscode-bundle.mjs",
     "package:vscode": "npm run build && node scripts/package-vscode.mjs",
     "defaults:package": "node scripts/package-defaults.mjs"
