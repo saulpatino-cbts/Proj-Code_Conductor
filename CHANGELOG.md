@@ -2,6 +2,10 @@
 
 All notable Code Conductor changes are recorded here. The project follows a pre-1.0 development model; entries remain under **Unreleased** until a release/tag is created.
 
+## Unreleased
+
+- Gate tagged releases on the committed APM package, lockfile, policy and projection audit.
+
 ## 0.1.3 (2026-11-07)
 
 Prepared 2026-11-07 from `main`; the tag decides the release date (`docs/RELEASE.md`). An odd minor version marks a pre-release.

@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 // Writes the CycloneDX SBOM of what the VS Code package bundles: npm's dependency graph of
 // the two bundled workspaces (the extension and the ccon runtime), development dependencies
@@ -10,8 +11,14 @@ import { readFileSync, writeFileSync } from 'node:fs';
 //   node scripts/release-sbom.mjs <out.cdx.json>
 const out = process.argv[2];
 if (!out) throw new Error('Usage: node scripts/release-sbom.mjs <out.cdx.json>');
-const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-const text = execFileSync(npm, ['sbom', '--sbom-format', 'cyclonedx', '--sbom-type', 'application', '--workspace', 'apps/vscode', '--workspace', 'packages/cli'], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, shell: false });
+const npmArgs = ['sbom', '--sbom-format', 'cyclonedx', '--sbom-type', 'application', '--workspace', 'apps/vscode', '--workspace', 'packages/cli'];
+// Node cannot spawn a .cmd shim with shell:false on Windows. Invoke the npm JS CLI
+// alongside this Node executable instead, retaining the repository's shell-free boundary.
+const npmCli = join(dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js');
+if (process.platform === 'win32' && !existsSync(npmCli)) throw new Error(`The npm CLI was not found beside Node at ${npmCli}.`);
+const npm = process.platform === 'win32' ? process.execPath : 'npm';
+const args = process.platform === 'win32' ? [npmCli, ...npmArgs] : npmArgs;
+const text = execFileSync(npm, args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, shell: false });
 const sbom = JSON.parse(text);
 if (sbom.bomFormat !== 'CycloneDX' || !Array.isArray(sbom.components)) throw new Error('npm sbom did not produce a CycloneDX document.');
 // npm writes scoped workspace names without their scope, so components are matched by purl.
